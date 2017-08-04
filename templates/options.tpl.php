@@ -1,6 +1,18 @@
-<?php 
+<?php
 
-use com\extremeidea\bidorbuy\storeintegrator\core as bobsi; 
+/**
+ * Copyright (c) 2014, 2015, 2016 Bidorbuy http://www.bidorbuy.co.za
+ * This software is the proprietary information of Bidorbuy.
+ *
+ * All Rights Reserved.
+ * Modification, redistribution and use in source and binary forms, with or without
+ * modification are not permitted without prior written approval by the copyright
+ * holder.
+ *
+ * Vendor: EXTREME IDEA LLC http://www.extreme-idea.com
+ */
+
+use com\extremeidea\bidorbuy\storeintegrator\core as bobsi;
 
 $bobsi_settings = new bobsi\Settings();
 $wordings = $bobsi_settings->getDefaultWordings();
@@ -9,13 +21,13 @@ $warnings = array_merge(
     bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getWarnings(),
     bobsi\StaticHolder::getWarnings()->getBusinessWarnings()
 );
-
+// @codingStandardsIgnoreStart
 foreach ($warnings as $warning): ?>
-    
+
     <div class="error">
-        <p><?= $warning ?></p>
+        <p><?php echo $warning ?></p>
     </div>
-    
+
 <?php endforeach; ?>
 
 <div id="bobsi-admin-header">
@@ -36,18 +48,20 @@ foreach ($warnings as $warning): ?>
 </div>
 
 <div id="poststuff">
-    <form id="bobsi-settings-form" name="bobsi-settings-form" method="POST" action="">
+    <form id="bobsi-settings-form" name="bobsi-settings-form" method="POST"
+          action="">
         <input type="hidden" name="submit_options" value="1"/>
         <div class="postbox postbox-left">
             <h3><span>Export Configuration</span></h3>
             <table class="form-table">
 
-                <?php if ($currencies): ?>
+                <?php if ($currencies) : ?>
                     <tr>
                         <th scope="row">Currency</th>
                         <td>
                             <?php echo $bobsi_currency; ?>
-                            <p class="description">Supported by WooCommerce Currency Converter</p>
+                            <p class="description">Supported by WooCommerce Currency
+                                Converter</p>
                         </td>
                     </tr>
                 <?php endif; ?>
@@ -58,7 +72,8 @@ foreach ($warnings as $warning): ?>
                                name="<?php echo bobsi\Settings::nameFilename; ?>"
                                value="<?php echo $bobsi_filename; ?>"/>
 
-                        <p class="description">16 characters max. Must start with a letter.<br>Can contain letters,
+                        <p class="description">16 characters max. Must start with a
+                            letter.<br>Can contain letters,
                             digits, "-" and "_"</p>
                     </td>
                 </tr>
@@ -67,8 +82,10 @@ foreach ($warnings as $warning): ?>
                     <td>
                         <select class="bobsi-input"
                                 name="<?php echo bobsi\Settings::nameCompressLibrary; ?>"><?php echo $compress_libs; ?></select>
-                        <img class="help_tip" data-tip="Choose a Compress Library to compress destination Tradefeed XML"
-                             src="<?php echo $tooltip_img_url; ?>" height="16" width="16"/>
+                        <img class="help_tip"
+                             data-tip="Choose a Compress Library to compress destination Tradefeed XML"
+                             src="<?php echo $tooltip_img_url; ?>" height="16"
+                             width="16"/>
                     </td>
                 </tr>
                 <tr>
@@ -80,9 +97,11 @@ foreach ($warnings as $warning): ?>
                         <img class="help_tip"
                              data-tip="If you do not manage stock quantities for your products, you can set the default
                                 stock quantity to be used for the XML feed. This quantity will apply to all your products"
-                             src="<?php echo $tooltip_img_url; ?>" height="16" width="16"/>
+                             src="<?php echo $tooltip_img_url; ?>" height="16"
+                             width="16"/>
 
-                        <p class="description">Set minimum quantity if quantity management is turned OFF</p>
+                        <p class="description">Set minimum quantity if quantity
+                            management is turned OFF</p>
                     </td>
                 </tr>
             </table>
@@ -109,7 +128,9 @@ foreach ($warnings as $warning): ?>
                             <table width="100%">
                                 <tr>
                                     <td id="cats-left">
-                                        <span class="title-item">Included Categories</span> <br>
+                                        <span
+                                            class="title-item">Included Categories</span>
+                                        <br>
                                         <?php echo $included_categories; ?>
                                     </td>
                                     <td id="cats-middle">
@@ -119,7 +140,8 @@ foreach ($warnings as $warning): ?>
                                         ?>
                                     </td>
                                     <td id="cats-right" class="last-item">
-                                        <span class="title-item">Excluded Categories</span>
+                                        <span
+                                            class="title-item">Excluded Categories</span>
                                         <img class="help_tip"
                                              data-tip="Move categories to the \'Excluded Categories\' column if would like to exclude any of your categories."
                                              src="<?php echo $tooltip_img_url; ?>"
@@ -136,7 +158,9 @@ foreach ($warnings as $warning): ?>
                             <table width="100%">
                                 <tr>
                                     <td id="cats-left">
-                                        <span class="title-item">Included Statuses</span> <br>
+                                        <span
+                                            class="title-item">Included Statuses</span>
+                                        <br>
                                         <?php echo $included_statuses; ?>
                                     </td>
                                     <td id="cats-middle">
@@ -146,7 +170,8 @@ foreach ($warnings as $warning): ?>
                                         ?>
                                     </td>
                                     <td id="cats-right" class="last-item">
-                                        <span class="title-item">Excluded Statuses</span>
+                                        <span
+                                            class="title-item">Excluded Statuses</span>
                                         <img class="help_tip"
                                              data-tip="Move statuses to the \'Excluded Statuses\' column if would like to exclude any of your statuses."
                                              src="<?php echo $tooltip_img_url; ?>"
@@ -168,7 +193,8 @@ foreach ($warnings as $warning): ?>
                value="<?php echo bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getTokenDownload(); ?>">
         <input type="hidden" name="<?php echo bobsi\Settings::nameTokenExport; ?>"
                value="<?php echo bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getTokenExport(); ?>">
-        <select style="display: none;" name="<?php echo bobsi\Settings::nameExportVisibilities . '[]'; ?>">
+        <select style="display: none;"
+                name="<?php echo bobsi\Settings::nameExportVisibilities . '[]'; ?>">
             <?php foreach (bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getExportVisibilities() as $visibility) : ?>
                 <option value="<?php echo $visibility; ?>"/>
             <?php endforeach; ?>
@@ -184,11 +210,11 @@ foreach ($warnings as $warning): ?>
             <table class="form-table">
 
                 <!-- Feature 3910 -->
-                <?php                
-                $baa = isset($_REQUEST['baa']) ? $_REQUEST['baa'] : false; 
-                if($baa == 1):
-                
-                ?>
+                <?php
+                $baa = isset($_REQUEST['baa']) ? $_REQUEST['baa'] : FALSE;
+                if ($baa == 1) :
+
+                    ?>
                     <tr>
                         <td colspan="2">
                             <b>Basic Access Authentication</b>
@@ -229,8 +255,10 @@ foreach ($warnings as $warning): ?>
 
                 <?php else: ?>
 
-                    <input type="hidden" name="<?= bobsi\Settings::nameUsername; ?>" value ="<?= $bobsi_username; ?>" />
-                    <input type="hidden" name="<?= bobsi\Settings::namePassword; ?>" value ="<?= $bobsi_password; ?>" />
+                    <input type="hidden" name="<?php echo bobsi\Settings::nameUsername; ?>"
+                           value="<?php echo $bobsi_username; ?>"/>
+                    <input type="hidden" name="<?php echo bobsi\Settings::namePassword; ?>"
+                           value="<?php echo $bobsi_password; ?>"/>
 
                 <?php endif; ?>
 
@@ -289,55 +317,67 @@ foreach ($warnings as $warning): ?>
                 <tr>
                     <td><label for="tokenExportUrl">Export</label></td>
                     <td>
-                        <input type="text" id="tokenExportUrl" class="bobsi-url" title="Click to select"
+                        <input type="text" id="tokenExportUrl" class="bobsi-url"
+                               title="Click to select"
                                value="<?php echo $export_link; ?>" readonly/>
                     </td>
                     <td>
                         <button type="button" class="button button-primary"
                                 onclick="window.open('<?php echo $export_link; ?>&r=' + new Date().getTime(),'_blank');"><?php echo __('Launch'); ?></button>
-                        <button type="button" class="button copy-button"><?php echo __('Copy'); ?></button>
+                        <button type="button"
+                                class="button copy-button"><?php echo __('Copy'); ?></button>
                     </td>
                 </tr>
                 <tr>
                     <td><label for="tokenDownloadUrl">Download</label></td>
                     <td>
-                        <input type="text" id="tokenDownloadUrl" class="bobsi-url" title="Click to select"
+                        <input type="text" id="tokenDownloadUrl" class="bobsi-url"
+                               title="Click to select"
                                value="<?php echo $download_link; ?>" readonly/>
                     </td>
                     <td class="button-section">
                         <button type="button" class="button button-primary"
                                 onclick="window.open('<?php echo $download_link; ?>&r=' + new Date().getTime(),'_blank');"><?php echo __('Launch'); ?></button>
-                        <button type="button" class="button copy-button"><?php echo __('Copy'); ?></button>
+                        <button type="button"
+                                class="button copy-button"><?php echo __('Copy'); ?></button>
                     </td>
                 </tr>
                 <tr>
                     <td><label for="resetaudit">Reset export data</label></td>
                     <td>
-                        <input type="text" id="resetaudit" class="bobsi-url" title="Click to select"
+                        <input type="text" id="resetaudit" class="bobsi-url"
+                               title="Click to select"
                                value="<?php echo $resetaudit_link; ?>" readonly/>
-                        <p class="description">Clicking on this link will reset all exported data in your tradefeed. This is done by clearing all exported product data, before re-adding all products to the export and completing the query. Please note, you will still need to run the export link once this process completes in order to update the download file.</p>
+                        <p class="description">Clicking on this link will reset all
+                            exported data in your tradefeed. This is done by clearing
+                            all exported product data, before re-adding all products
+                            to the export and completing the query. Please note, you
+                            will still need to run the export link once this process
+                            completes in order to update the download file.</p>
                     </td>
                     <td class="bobsi-top">
                         <button type="button" class="button button-primary"
                                 onclick="window.open('<?php echo $resetaudit_link; ?>&r=' + new Date().getTime(),'_blank');"><?php echo __('Launch'); ?></button>
-                        <button type="button" class="button copy-button"><?php echo __('Copy'); ?></button>
+                        <button type="button"
+                                class="button copy-button"><?php echo __('Copy'); ?></button>
                     </td>
                 </tr>
             </table>
         </div>
         <p class="button-item">
-            <button class="button button-primary"><?php echo __('Reset Tokens'); ?></button>
+            <button
+                class="button button-primary"><?php echo __('Reset Tokens'); ?></button>
         </p>
     </form>
 </div>
-
 
 
 <div class="postbox version postbox-inner">
     <h3>Version</h3>
     <h3>
         <span>
-            <a href="<?php echo $phpInfo_link ?>" target="_blank">@See PHP information</a><br>
+            <a href="<?php echo $phpInfo_link ?>" target="_blank">@See PHP
+                information</a><br>
             <?php echo bobsi\Version::getLivePluginVersion(); ?>
         </span>
     </h3>

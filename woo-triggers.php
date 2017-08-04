@@ -5,8 +5,9 @@
  * This software is the proprietary information of Bidorbuy.
  *
  * All Rights Reserved.
- * Modification, redistribution and use in source and binary forms, with or without modification
- * are not permitted without prior written approval by the copyright holder.
+ * Modification, redistribution and use in source and binary forms, with or without
+ * modification are not permitted without prior written approval by the copyright
+ * holder.
  *
  * Vendor: EXTREME IDEA LLC http://www.extreme-idea.com
  */
@@ -32,6 +33,13 @@ add_action('create_term', 'bobsi_term_create', 10, 3);//attributes and categorie
 add_action('edited_terms', 'bobsi_term_update', 10, 2);//attributes and categories
 add_action('delete_term', 'bobsi_term_delete', 10, 4);//attributes and categories
 
+/**
+ * Product variation update
+ *
+ * @param integer $vid id
+ *
+ * @return void
+ */
 function bobsi_product_variation_update($vid) {
     global $wpdb, $bobsi_products_touched;
 
@@ -39,19 +47,43 @@ function bobsi_product_variation_update($vid) {
     $pid = $p->parent->id;
     if (!isset($bobsi_products_touched[$pid])) {
         $bobsi_products_touched[$pid] = $pid;
-        $wpdb->query(bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getQueries()->getAddJobQueries($pid, bobsi\Queries::STATUS_UPDATE));
+        $wpdb->query(bobsi\StaticHolder::getBidorbuyStoreIntegrator()
+            ->getQueries()->getAddJobQueries($pid, bobsi\Queries::STATUS_UPDATE));
     }
 }
 
-//we can't easily catch difference between new/update events :(
+/**
+ * Product updated
+ * we can't easily catch difference between new/update events :(
+ *
+ * @param integer $post_ID id
+ * @param mixed $post post
+ *
+ * @return void
+ */
 function bobsi_product_updated($post_ID, $post) {
     bobsi_process_product($post);
 }
 
+/**
+ * Product bulk or quick update
+ *
+ * @param object $product product
+ *
+ * @return void
+ */
 function bobsi_product_bulk_or_quick_update($product) {
     bobsi_process_product($product);
 }
 
+/**
+ * Attribute updated
+ *
+ * @param integer $attr_id attr id
+ * @param string $attr attribute
+ *
+ * @return void
+ */
 function bobsi_attribute_updated($attr_id, $attr) {
     global $wpdb;
 
@@ -61,10 +93,19 @@ function bobsi_attribute_updated($attr_id, $attr) {
     );
 
     foreach ($pids as $pid) {
-        $wpdb->query(bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getQueries()->getAddJobQueries($pid, bobsi\Queries::STATUS_UPDATE));
+        $wpdb->query(bobsi\StaticHolder::getBidorbuyStoreIntegrator()
+            ->getQueries()->getAddJobQueries($pid, bobsi\Queries::STATUS_UPDATE));
     }
 }
 
+/**
+ * Get products ids by attr values.
+ *
+ * @param string $key key
+ * @param string $values value
+ *
+ * @return mixed
+ */
 function bobsi_get_products_ids_by_attr_values($key, $values) {
     $args = array(
         'fields' => 'ids',
@@ -85,6 +126,15 @@ function bobsi_get_products_ids_by_attr_values($key, $values) {
     return $r->posts;
 }
 
+/**
+ * Term create
+ *
+ * @param integer $term_id id
+ * @param integer $tt_id id
+ * @param string $taxonomy taxonomy
+ *
+ * @return void
+ */
 function bobsi_term_create($term_id, $tt_id, $taxonomy) {
 //product attribute
     if (strpos($taxonomy, 'pa_') === 0) {
@@ -92,6 +142,14 @@ function bobsi_term_create($term_id, $tt_id, $taxonomy) {
     }
 }
 
+/**
+ * Term update
+ *
+ * @param integer $term_id id
+ * @param string $taxonomy taxonomy
+ *
+ * @return void
+ */
 function bobsi_term_update($term_id, $taxonomy) {
     if ($taxonomy == 'product_cat') {
         bobsi_category_update($term_id, bobsi\Queries::STATUS_UPDATE);
@@ -103,6 +161,16 @@ function bobsi_term_update($term_id, $taxonomy) {
     }
 }
 
+/**
+ * Term delete
+ *
+ * @param string $term term
+ * @param integer $tt_id id
+ * @param string $taxonomy taxonomy
+ * @param string $deleted_term deleted_term
+ *
+ * @return void
+ */
 function bobsi_term_delete($term, $tt_id, $taxonomy, $deleted_term) {
     if ($taxonomy == 'product_cat') {
         bobsi_category_update($tt_id, bobsi\Queries::STATUS_DELETE);
@@ -114,13 +182,21 @@ function bobsi_term_delete($term, $tt_id, $taxonomy, $deleted_term) {
     }
 }
 
+/**
+ * Get products
+ *
+ * @param array $exportConfiguration config
+ *
+ * @return array
+ */
 function &bobsi_get_products(&$exportConfiguration) {
     $itemsPerIteration = intval($exportConfiguration[bobsi\Settings::paramItemsPerIteration]);
     $iteration = intval($exportConfiguration[bobsi\Settings::paramIteration]);
     $categoryId = $exportConfiguration[bobsi\Settings::paramCategoryId];
 
     if ($categoryId == 0) {
-//    TODO: tax_query starts from 3.1, and As of 3.5, a bug was fixed where tax_query would inadvertently return all posts when a result was empty.
+//    TODO: tax_query starts from 3.1, and As of 3.5, a bug was fixed where
+        // tax_query would inadvertently return all posts when a result was empty.
         $wpq = array(
             'post_type' => 'product',
             'fields' => 'ids',
@@ -129,13 +205,14 @@ function &bobsi_get_products(&$exportConfiguration) {
                     'taxonomy' => 'product_cat',
                     'field' => 'id',
                     'terms' => bobsi_get_export_categories_ids(),
-                    'include_children' => false,
+                    'include_children' => FALSE,
                     'operator' => 'NOT IN'
                 )
             )
         );
     } else {
-//    TODO: tax_query starts from 3.1, and As of 3.5, a bug was fixed where tax_query would inadvertently return all posts when a result was empty.
+//    TODO: tax_query starts from 3.1, and As of 3.5, a bug was fixed where tax_query would
+        // inadvertently return all posts when a result was empty.
         $wpq = array(
             'post_type' => 'product',
             'fields' => 'ids',
@@ -144,7 +221,7 @@ function &bobsi_get_products(&$exportConfiguration) {
                     'taxonomy' => 'product_cat',
                     'field' => 'id',
                     'terms' => $categoryId,
-                    'include_children' => false,
+                    'include_children' => FALSE,
                 )
             )
         );
@@ -162,11 +239,19 @@ function &bobsi_get_products(&$exportConfiguration) {
     $query = new WP_Query();
     $posts = $query->query($wpq);
 
-    $query = null;
+    $query = NULL;
 
     return $posts;
 }
 
+/**
+ * Category update
+ *
+ * @param integer $term_id id
+ * @param string $action action
+ *
+ * @return void
+ */
 function bobsi_category_update($term_id, $action) {
     global $wpdb;
 
@@ -183,33 +268,55 @@ function bobsi_category_update($term_id, $action) {
     }
 }
 
+/**
+ * Tax update
+ *
+ * @return void
+ */
 function bobsi_tax_update() {
     bobsi_refresh_all_products();
 }
 
+/**
+ * Process product
+ *
+ * @param mixed $post post
+ *
+ * @return void
+ */
 function bobsi_process_product($post) {
     global $wpdb, $bobsi_products_touched;
 
     $productId = isset($post->ID) ? $post->ID : $post->id;
     $postStatus = isset($post->post->post_status) ? $post->post->post_status : $post->post_status;
-    
+
     // do not response on autosave
     if (!isset($_POST['data']['wp_autosave']) and !isset($bobsi_products_touched[$productId])) {
         $bobsi_products_touched[$productId] = $productId;
 
-        if (in_array($postStatus, bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getExportStatuses())) {
-            $wpdb->query(bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getQueries()->getSetJobsRowStatusQuery($productId, bobsi\Queries::STATUS_DELETE, time()));
-            $wpdb->query(bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getQueries()->getAddJobQueries($productId, bobsi\Queries::STATUS_UPDATE));
+        if (in_array($postStatus, bobsi\StaticHolder::getBidorbuyStoreIntegrator()
+            ->getSettings()->getExportStatuses())) {
+            $wpdb->query(bobsi\StaticHolder::getBidorbuyStoreIntegrator()
+                ->getQueries()->getSetJobsRowStatusQuery($productId, bobsi\Queries::STATUS_DELETE, time()));
+            $wpdb->query(bobsi\StaticHolder::getBidorbuyStoreIntegrator()
+
+                ->getQueries()->getAddJobQueries($productId, bobsi\Queries::STATUS_UPDATE));
         } else {
-            $wpdb->query(bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getQueries()->getAddJobQueries($productId, bobsi\Queries::STATUS_DELETE));
+            $wpdb->query(bobsi\StaticHolder::getBidorbuyStoreIntegrator()
+                ->getQueries()->getAddJobQueries($productId, bobsi\Queries::STATUS_DELETE));
         }
     }
 }
 
+/**
+ * Refresh all products
+ *
+ * @return void
+ */
 function bobsi_refresh_all_products() {
     global $wpdb;
 
     $wpdb->query(bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getQueries()->getTruncateJobsQuery());
     $wpdb->query(bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getQueries()->getTruncateProductQuery());
-    bobsi_add_all_products_in_tradefeed_queue(true);
+    bobsi_add_all_products_in_tradefeed_queue(TRUE);
 }

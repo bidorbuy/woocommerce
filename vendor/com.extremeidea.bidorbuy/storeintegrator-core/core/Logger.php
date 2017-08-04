@@ -18,7 +18,7 @@ use com\extremeidea\php\tools\log4php as log4php;
 
 // Patch for Joomla 1.5 https://issues.apache.org/jira/browse/LOG4PHP-129
 if (function_exists('__autoload')) {
-    define('WARN_ON_AUTOLOAD_IGNORE', true);
+    define('WARN_ON_AUTOLOAD_IGNORE', TRUE);
     spl_autoload_register('__autoload');
 }
 
@@ -43,11 +43,11 @@ class LoggerAppenderMail extends log4php\LoggerAppenderMail {
     }
 
     public function close() {
-        if ($this->closed != true) {
+        if ($this->closed != TRUE) {
             $from = $this->from;
             $sendTo = $this->to;
 
-            if (!empty($this->body) and $from !== null and $sendTo !== null and $this->layout !== null) {
+            if (!empty($this->body) and $from !== NULL and $sendTo !== NULL and $this->layout !== NULL) {
                 if (!$this->dry) {
                     $message = $this->layout->getHeader() . $this->body . $this->layout->getFooter();
                     $subject = $this->subject;
@@ -61,20 +61,20 @@ class LoggerAppenderMail extends log4php\LoggerAppenderMail {
                     echo "DRY MODE OF MAIL APP.: Send mail to: " . $sendTo . " with content: " . $this->body;
                 }
             }
-            $this->closed = true;
+            $this->closed = TRUE;
         }
     }
 }
 
 class Logger {
     private $settings;
-    private static $configured = false;
+    private static $configured = FALSE;
 
     public function __construct(Settings $settings) {
         $this->settings = $settings;
 
-        if (self::$configured === false) {
-            self::$configured = true;
+        if (self::$configured === FALSE) {
+            self::$configured = TRUE;
             log4php\Logger::configure(dirname(__FILE__) . '/log4php.xml');
         }
     }

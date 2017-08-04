@@ -1,6 +1,7 @@
-# WordPress / WooCommerce bidorbuy Store Integrator
+# WordPress bidorbuy Store Integrator
 
 ### Compatibility
+
 Requires at least: WordPress 3.5.x
 
 Tested up to:  WordPress 4.5.x
@@ -16,9 +17,9 @@ To make use of this plugin, you'll need to be an advanced seller on bidorbuy.
 
 ### System requirements
 
-Minimum PHP version required: 5.3.0.
+Supported PHP versions: 5.4 (5.6, 7.0 for WooCommerce 3.1.1)
 
-PHP extensions: curl, mbstring.
+PHP extensions: curl, mbstring
 
 ### Installation
 

@@ -5,14 +5,22 @@
  * This software is the proprietary information of Bidorbuy.
  *
  * All Rights Reserved.
- * Modification, redistribution and use in source and binary forms, with or without modification
- * are not permitted without prior written approval by the copyright holder.
+ * Modification, redistribution and use in source and binary forms, with or without
+ * modification are not permitted without prior written approval by the copyright
+ * holder.
  *
  * Vendor: EXTREME IDEA LLC http://www.extreme-idea.com
  */
 
 use com\extremeidea\bidorbuy\storeintegrator\core as bobsi;
 
+/**
+ * Get Categories.
+ *
+ * @param array $args arguments
+ *
+ * @return array|WP_Error
+ */
 function &bobsi_get_categories($args = array()) {
     $taxonomies = array(
         'product_cat',
@@ -21,14 +29,24 @@ function &bobsi_get_categories($args = array()) {
     $terms = empty($args) ? get_terms($taxonomies) : get_terms($taxonomies, $args);
 
     if (is_object($terms) && ($terms instanceof WP_Error)) {
-        bobsi\StaticHolder::getBidorbuyStoreIntegrator()->logError('Unable to get category terms: ' . implode('. ', array_keys($terms->errors)));
+        bobsi\StaticHolder::getBidorbuyStoreIntegrator()->logError('Unable to get category terms: '
+            . implode('. ', array_keys($terms->errors)));
         $terms = array();
     }
 
     return $terms;
 }
 
-function bobsi_exit_with_error($message, $type = 'error', $exit = true) {
+/**
+ * Exit with error.
+ *
+ * @param string $message error message
+ * @param string $type error type
+ * @param bool $exit flag to exit
+ *
+ * @return void
+ */
+function bobsi_exit_with_error($message, $type = 'error', $exit = TRUE) {
     $message = '<div class="' . $type . '"><p>' . $message . '</p></div>';
     if ($exit) {
         exit ($message);
@@ -37,6 +55,13 @@ function bobsi_exit_with_error($message, $type = 'error', $exit = true) {
     }
 }
 
+/**
+ * Get export categories ids
+ *
+ * @param array $ids categories ids
+ *
+ * @return array
+ */
 function bobsi_get_export_categories_ids($ids = array()) {
     $uncategorized = in_array(0, $ids);
 
@@ -53,7 +78,7 @@ function bobsi_get_export_categories_ids($ids = array()) {
         $ids[] = $term->term_id;
     }
 
-    $terms = null;
+    $terms = NULL;
 
     if (!$uncategorized) {
         $ids[] = 0;
@@ -62,6 +87,14 @@ function bobsi_get_export_categories_ids($ids = array()) {
     return $ids;
 }
 
+/**
+ * Get shipping class
+ *
+ * @param integer $post_id post id
+ * @param int $getParentShipmentMethodById id
+ *
+ * @return string
+ */
 function bobsi_get_shipping_class($post_id, $getParentShipmentMethodById = 0) {
     $classes = get_the_terms($post_id, 'product_shipping_class');
     $shipping_class_name = ($classes && !is_wp_error($classes)) ? current($classes)->name : '';

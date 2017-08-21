@@ -2,9 +2,9 @@
 
 ### Compatibility
 
-Requires at least: WordPress 3.5.x
+Requires at least: WordPress 3.5
 
-Tested up to:  WordPress 4.5.x
+Tested up to:  WordPress 4.5
 
 ### Description
 The bidorbuy Store Integrator allows you to get products from your online store listed on bidorbuy quickly and easily.
@@ -33,18 +33,18 @@ PHP extensions: curl, mbstring
 1. Log in to control panel as administrator.
 2. Go to Plugins > Installed plugins > bidorbuy Store Integrator.
 3. Deactivate the bidorbuy Store Integrator.
-4. Delete the plufin.
+4. Delete the plugin.
 
 ### Upgrade
 
 Remove all old files of previous installation:
 
-1. Root folder-->`wp-content`-->`plugins`-->`bidorbuystoreintegrator` and re-install the archive. Please look through the installation chapter.
+1. Root folder > wp-content > plugins > bidorbuystoreintegrator and re-install the archive. Please look through the installation chapter.
 
 ### Configuration
 
 1. Log in to control panel as administrator.
-2. Navigate to Settings > bidorbuy Store-Integrator.
+2. Navigate to Settings > bidorbuy Store Integrator.
 3. Set the export criteria.
 4. Press the `Save` button.
 5. Press the `Export` button.

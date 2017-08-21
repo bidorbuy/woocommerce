@@ -7,7 +7,7 @@
  * @codingStandardsIgnoreEnd
  * Author: bidorbuy
  * Author URI: www.bidorbuy.co.za
- * Version: 2.0.11
+ * Version: 2.0.12
  */
 
 /**
@@ -523,4 +523,22 @@ function plugin_update() {
  */
 function uninstall_update_settings() {
     return delete_option('bobsi_db_version');
+}
+
+/* Defect #4031 */
+add_filter('style_loader_src', 'bobsi_delete_css');
+
+/**
+ * Delete css from header.
+ *
+ * @param string $href url to css
+ *
+ * @return mixed
+ */
+function bobsi_delete_css($href) {
+    if (strpos($href, "menu.css") !== FALSE) {
+        return FALSE;
+    }
+
+    return $href;
 }

@@ -17,10 +17,8 @@ use com\extremeidea\bidorbuy\storeintegrator\core as bobsi;
 $bobsi_settings = new bobsi\Settings();
 $wordings = $bobsi_settings->getDefaultWordings();
 
-$warnings = array_merge(
-    bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getWarnings(),
-    bobsi\StaticHolder::getWarnings()->getBusinessWarnings()
-);
+$warnings = array_merge(bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getWarnings(),
+    bobsi\StaticHolder::getWarnings()->getBusinessWarnings());
 // @codingStandardsIgnoreStart
 foreach ($warnings as $warning): ?>
 
@@ -135,8 +133,8 @@ foreach ($warnings as $warning): ?>
                                     </td>
                                     <td id="cats-middle">
                                         <?php
-                                        echo get_submit_button('< Include', 'secondary', 'include') .
-                                            get_submit_button('> Exclude', 'secondary', 'exclude');
+                                        echo get_submit_button('< Include', 'secondary', 'include')
+                                            . get_submit_button('> Exclude', 'secondary', 'exclude');
                                         ?>
                                     </td>
                                     <td id="cats-right" class="last-item">
@@ -165,8 +163,8 @@ foreach ($warnings as $warning): ?>
                                     </td>
                                     <td id="cats-middle">
                                         <?php
-                                        echo get_submit_button('< Include', 'secondary', 'include-stat') .
-                                            get_submit_button('> Exclude', 'secondary', 'exclude-stat');
+                                        echo get_submit_button('< Include', 'secondary', 'include-stat')
+                                            . get_submit_button('> Exclude', 'secondary', 'exclude-stat');
                                         ?>
                                     </td>
                                     <td id="cats-right" class="last-item">
@@ -190,12 +188,14 @@ foreach ($warnings as $warning): ?>
             </table>
         </div>
         <input type="hidden" name="<?php echo bobsi\Settings::nameTokenDownload; ?>"
-               value="<?php echo bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getTokenDownload(); ?>">
+               value="<?php echo bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()
+                   ->getTokenDownload(); ?>">
         <input type="hidden" name="<?php echo bobsi\Settings::nameTokenExport; ?>"
                value="<?php echo bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getTokenExport(); ?>">
         <select style="display: none;"
                 name="<?php echo bobsi\Settings::nameExportVisibilities . '[]'; ?>">
-            <?php foreach (bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getExportVisibilities() as $visibility) : ?>
+            <?php foreach (bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getExportVisibilities() as
+                           $visibility) : ?>
                 <option value="<?php echo $visibility; ?>"/>
             <?php endforeach; ?>
         </select>
@@ -205,7 +205,7 @@ foreach ($warnings as $warning): ?>
         </p>
 
 
-        <div class="postbox logfiles postbox-inner">
+        <div class="postbox debug postbox-inner">
             <h3><span>Debug</span></h3>
             <table class="form-table">
 
@@ -298,87 +298,93 @@ foreach ($warnings as $warning): ?>
                     </td>
                 </tr>
             </table>
-    </form>
-    <?php echo $logfiles_table; ?>
-</div>
-
-<div id="linksblock">
-    <div id="ctrl-c-message">Press Ctrl+C</div>
-
-    <form name="bobsi-export-form" method="POST" action="">
-        <div class="postbox links postbox-inner">
-            <input class="bobsi-input" type="hidden"
-                   id="<?php echo bobsi\Settings::nameActionReset; ?>"
-                   name="<?php echo bobsi\Settings::nameActionReset; ?>"
-                   value="1"/>
-
-            <h3><span>Links</span></h3>
-            <table class="form-table export-links">
-                <tr>
-                    <td><label for="tokenExportUrl">Export</label></td>
-                    <td>
-                        <input type="text" id="tokenExportUrl" class="bobsi-url"
-                               title="Click to select"
-                               value="<?php echo $export_link; ?>" readonly/>
-                    </td>
-                    <td>
-                        <button type="button" class="button button-primary"
-                                onclick="window.open('<?php echo $export_link; ?>&r=' + new Date().getTime(),'_blank');"><?php echo __('Launch'); ?></button>
-                        <button type="button"
-                                class="button copy-button"><?php echo __('Copy'); ?></button>
-                    </td>
-                </tr>
-                <tr>
-                    <td><label for="tokenDownloadUrl">Download</label></td>
-                    <td>
-                        <input type="text" id="tokenDownloadUrl" class="bobsi-url"
-                               title="Click to select"
-                               value="<?php echo $download_link; ?>" readonly/>
-                    </td>
-                    <td class="button-section">
-                        <button type="button" class="button button-primary"
-                                onclick="window.open('<?php echo $download_link; ?>&r=' + new Date().getTime(),'_blank');"><?php echo __('Launch'); ?></button>
-                        <button type="button"
-                                class="button copy-button"><?php echo __('Copy'); ?></button>
-                    </td>
-                </tr>
-                <tr>
-                    <td><label for="resetaudit">Reset export data</label></td>
-                    <td>
-                        <input type="text" id="resetaudit" class="bobsi-url"
-                               title="Click to select"
-                               value="<?php echo $resetaudit_link; ?>" readonly/>
-                        <p class="description">Clicking on this link will reset all
-                            exported data in your tradefeed. This is done by clearing
-                            all exported product data, before re-adding all products
-                            to the export and completing the query. Please note, you
-                            will still need to run the export link once this process
-                            completes in order to update the download file.</p>
-                    </td>
-                    <td class="bobsi-top">
-                        <button type="button" class="button button-primary"
-                                onclick="window.open('<?php echo $resetaudit_link; ?>&r=' + new Date().getTime(),'_blank');"><?php echo __('Launch'); ?></button>
-                        <button type="button"
-                                class="button copy-button"><?php echo __('Copy'); ?></button>
-                    </td>
-                </tr>
-            </table>
         </div>
-        <p class="button-item">
-            <button
-                class="button button-primary"><?php echo __('Reset Tokens'); ?></button>
-        </p>
+        <input type="button" onclick="jQuery('#submit').click()"
+               class="button-primary bobsi-save-settings" value="<?php _e('Save Changes')?>">
     </form>
-</div>
+
+    <div class="postbox logfiles postbox-inner">
+        <h3><span>Logs</span></h3>
+        <?php echo $logfiles_table; ?>
+    </div>
+
+    <div id="linksblock">
+        <div id="ctrl-c-message">Press Ctrl+C</div>
+
+        <form name="bobsi-export-form" method="POST" action="">
+            <div class="postbox links postbox-inner">
+                <input class="bobsi-input" type="hidden"
+                       id="<?php echo bobsi\Settings::nameActionReset; ?>"
+                       name="<?php echo bobsi\Settings::nameActionReset; ?>"
+                       value="1"/>
+
+                <h3><span>Links</span></h3>
+                <table class="form-table export-links">
+                    <tr>
+                        <td><label for="tokenExportUrl">Export</label></td>
+                        <td>
+                            <input type="text" id="tokenExportUrl" class="bobsi-url"
+                                   title="Click to select"
+                                   value="<?php echo $export_link; ?>" readonly/>
+                        </td>
+                        <td>
+                            <button type="button" class="button button-primary"
+                                    onclick="window.open('<?php echo $export_link; ?>&r=' + new Date().getTime(),'_blank');"><?php echo __('Launch'); ?></button>
+                            <button type="button"
+                                    class="button copy-button"><?php echo __('Copy'); ?></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label for="tokenDownloadUrl">Download</label></td>
+                        <td>
+                            <input type="text" id="tokenDownloadUrl" class="bobsi-url"
+                                   title="Click to select"
+                                   value="<?php echo $download_link; ?>" readonly/>
+                        </td>
+                        <td class="button-section">
+                            <button type="button" class="button button-primary"
+                                    onclick="window.open('<?php echo $download_link; ?>&r=' + new Date().getTime(),'_blank');"><?php echo __('Launch'); ?></button>
+                            <button type="button"
+                                    class="button copy-button"><?php echo __('Copy'); ?></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label for="resetaudit">Reset export data</label></td>
+                        <td>
+                            <input type="text" id="resetaudit" class="bobsi-url"
+                                   title="Click to select"
+                                   value="<?php echo $resetaudit_link; ?>" readonly/>
+                            <p class="description">Clicking on this link will reset all
+                                exported data in your tradefeed. This is done by clearing
+                                all exported product data, before re-adding all products
+                                to the export and completing the query. Please note, you
+                                will still need to run the export link once this process
+                                completes in order to update the download file.</p>
+                        </td>
+                        <td class="bobsi-top">
+                            <button type="button" class="button button-primary"
+                                    onclick="window.open('<?php echo $resetaudit_link; ?>&r=' + new Date().getTime(),'_blank');"><?php echo __('Launch'); ?></button>
+                            <button type="button"
+                                    class="button copy-button"><?php echo __('Copy'); ?></button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <p class="button-item">
+                <button
+                    class="button button-primary"><?php echo __('Reset Tokens'); ?></button>
+            </p>
+        </form>
+    </div>
 
 
-<div class="postbox version postbox-inner">
-    <h3>Version</h3>
-    <h3>
+    <div class="postbox version postbox-inner">
+        <h3>Version</h3>
+        <h3>
         <span>
             <a href="<?php echo $phpInfo_link ?>" target="_blank">@See PHP
                 information</a><br>
             <?php echo bobsi\Version::getLivePluginVersion(); ?>
         </span>
-    </h3>
-</div>
+        </h3>
+    </div>

@@ -21,5 +21,5 @@ jQuery(document).ready(function () {
         jQuery(this).select();
     });
 
-    jQuery('.logfiles').before(jQuery('#linksblock'))
+    jQuery('.debug').before(jQuery('#linksblock'))
 });

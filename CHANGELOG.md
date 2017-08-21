@@ -2,6 +2,12 @@
 
 ### Changelog
 
+#### 2.0.12
+* Improved the logging strategy for Debug level.
+* Added extra save button which was removed from Debug section (the settings page).
+
+_[Updated on August 21, 2017]_
+
 ### 2.0.11
 
 * EOL (End-of-life due to the end of life of this version) for PHP 5.3 support.

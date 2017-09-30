@@ -16,6 +16,8 @@ use com\extremeidea\bidorbuy\storeintegrator\core as bobsi;
 
 require_once(dirname(__FILE__) . '/../../../wp-config.php');
 
+bobsi_check_woocommers_plugin();
+
 /**
  * Get breadcrumb
  *
@@ -87,7 +89,7 @@ function &bobsi_build_export_product(&$product, $variations = array(), $categori
             $exportedProduct[bobsi\Tradefeed::nameProductMarketPrice] = bobsi_convert_price(
                 (double)$product->get_price_including_tax()
             );
-            
+
             $product->set_price($price);
         } else {
             $exportedProduct[bobsi\Tradefeed::nameProductMarketPrice] = '';
@@ -96,7 +98,7 @@ function &bobsi_build_export_product(&$product, $variations = array(), $categori
         $exportedProduct[bobsi\Tradefeed::nameProductPrice] = bobsi_convert_price(
             (double)$product->get_price_including_tax()
         );
-        
+
         $exportedProduct[bobsi\Tradefeed::nameProductMarketPrice] = '';
     }
 
@@ -106,8 +108,8 @@ function &bobsi_build_export_product(&$product, $variations = array(), $categori
     //$exportedProduct[bobsi\Tradefeed::nameProductShippingClass] = $product->get_shipping_class();
 
     $exportedProduct[bobsi\Tradefeed::nameProductShippingClass] =
-        ($product instanceof WC_Product_Variation) ? 
-            bobsi_get_shipping_class($product->variation_id, $product->parent->id) 
+        ($product instanceof WC_Product_Variation) ?
+            bobsi_get_shipping_class($product->variation_id, $product->parent->id)
             : bobsi_get_shipping_class($product->id);
 
     if (isset($variations['attributes'])) {
@@ -115,37 +117,41 @@ function &bobsi_build_export_product(&$product, $variations = array(), $categori
             $exportedProduct[bobsi\Tradefeed::nameProductAttributes][$key] = $value;
         }
     }
+    $exclAttr = get_post_meta($product->id, '_' . BOBSI_WOOCOMMERCE_ATTRIBUTE_FIELD);
+    $excludedAttributes = array_shift($exclAttr) ?: array();
+    $excludedAttributes = array_map('bobsi_attribute_label', $excludedAttributes);
+    $exportedProduct[bobsi\Tradefeed::nameProductExcludedAttributes] = $excludedAttributes;
 
     if ($product->width) {
         $exportedProduct[bobsi\Tradefeed::nameProductAttributes][bobsi\Tradefeed::nameProductAttrWidth] =
             number_format($product->width, 2, '.', '');
-//        $exportedProduct[bobsi\Tradefeed::nameProductAttributes][bobsi\Tradefeed::nameProductAttrWidth] =
+        //        $exportedProduct[bobsi\Tradefeed::nameProductAttributes][bobsi\Tradefeed::nameProductAttrWidth] =
         // intval($product->width);
     }
 
     if ($product->height) {
-        $exportedProduct[bobsi\Tradefeed::nameProductAttributes][bobsi\Tradefeed::nameProductAttrHeight] = 
+        $exportedProduct[bobsi\Tradefeed::nameProductAttributes][bobsi\Tradefeed::nameProductAttrHeight] =
             number_format($product->height, 2, '.', '');
-//        $exportedProduct[bobsi\Tradefeed::nameProductAttributes][bobsi\Tradefeed::nameProductAttrHeight] =
+        //        $exportedProduct[bobsi\Tradefeed::nameProductAttributes][bobsi\Tradefeed::nameProductAttrHeight] =
         // intval($product->height);
     }
 
     if ($product->length) {
-        $exportedProduct[bobsi\Tradefeed::nameProductAttributes][bobsi\Tradefeed::nameProductAttrLength] = 
+        $exportedProduct[bobsi\Tradefeed::nameProductAttributes][bobsi\Tradefeed::nameProductAttrLength] =
             number_format($product->length, 2, '.', '');
-//        $exportedProduct[bobsi\Tradefeed::nameProductAttributes][bobsi\Tradefeed::nameProductAttrLength] =
+        //        $exportedProduct[bobsi\Tradefeed::nameProductAttributes][bobsi\Tradefeed::nameProductAttrLength] =
         // intval($product->length);
     }
 
     if ($product->has_weight()) {
-        $exportedProduct[bobsi\Tradefeed::nameProductAttributes][bobsi\Tradefeed::nameProductAttrShippingWeight] = 
+        $exportedProduct[bobsi\Tradefeed::nameProductAttributes][bobsi\Tradefeed::nameProductAttrShippingWeight] =
             number_format($product->get_weight(), 2, '.', '') . get_option('woocommerce_weight_unit', '');
-//        $exportedProduct[bobsi\Tradefeed::nameProductAttributes][bobsi\Tradefeed::nameProductAttrWeight] =
+        //        $exportedProduct[bobsi\Tradefeed::nameProductAttributes][bobsi\Tradefeed::nameProductAttrWeight] =
         // intval($product->get_weight());
     }
 
     $exportedProduct[bobsi\Tradefeed::nameProductAvailableQty] = bobsi_calc_product_quantity(
-        $product, 
+        $product,
         bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getDefaultStockQuantity()
     );
 
@@ -182,7 +188,7 @@ function &bobsi_build_export_product(&$product, $variations = array(), $categori
         . join(bobsi\Tradefeed::categoryIdDelimiter, $categorie_ids)
         . bobsi\Tradefeed::categoryIdDelimiter;
     $exportedProduct[bobsi\Tradefeed::nameProductCategory] = join(
-        bobsi\Tradefeed::categoryNameDelimiter, 
+        bobsi\Tradefeed::categoryNameDelimiter,
         $categorie_names
     );
 
@@ -210,9 +216,9 @@ function bobsi_export_products($id, $available_variations = array()) {
     $product = function_exists('wc_get_product') ? wc_get_product($id) : get_product($id);
     bobsi\StaticHolder::getBidorbuyStoreIntegrator()->logInfo('Processing product id: ' . $id);
 
-    if (count(bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getExportStatuses()) == 0 
+    if (count(bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getExportStatuses()) == 0
         or !in_array(
-            $product->post->post_status, 
+            $product->post->post_status,
             bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getExportStatuses())
     ) {
         return $exportedProducts;
@@ -254,10 +260,10 @@ function bobsi_export_products($id, $available_variations = array()) {
             }
         }
     } else if (($product instanceof WC_Product_Simple || $product instanceof WC_Product_Variation)) {
-        $attributes = $product instanceof WC_Product_Variation ? 
+        $attributes = $product instanceof WC_Product_Variation ?
             $product->parent->get_attributes() : $product->get_attributes();
-        
-        $attributes_variations = $product instanceof WC_Product_Variation ? 
+
+        $attributes_variations = $product instanceof WC_Product_Variation ?
             $product->get_variation_attributes() : array();
 
         if (bobsi_calc_product_quantity($product, $defaultStockQuantity) > $exportQuantityMoreThan) {
@@ -273,7 +279,7 @@ function bobsi_export_products($id, $available_variations = array()) {
                         bobsi_build_export_product_helper(
                             $product, $variations, $categoriesMatching, $exportedProducts
                         );
-                    } 
+                    }
                 }
             } else {
                 $variations = bobsi_get_sorted_attributes($attributes_variations, $attributes, $product);
@@ -330,11 +336,11 @@ function bobsi_get_sorted_attributes($attributes_variations, $attributes, &$prod
     }
 
     foreach ($attributes as $key => &$attribute) {
-//      if ((isset($attribute['is_visible']) && $attribute['is_visible'])) {
-        $variations['attributes'][bobsi_attribute_label($attribute['name'])] = 
+        //      if ((isset($attribute['is_visible']) && $attribute['is_visible'])) {
+        $variations['attributes'][bobsi_attribute_label($attribute['name'])] =
             isset($attributes_variations['attribute_' . $key]) ? $attributes_variations['attribute_' . $key]
-            : $product->get_attribute($attribute['name']);
-//      }
+                : $product->get_attribute($attribute['name']);
+        //      }
     }
 
     return $variations;
@@ -356,13 +362,21 @@ function bobsi_attribute_label($name) {
 
 $token = isset($_REQUEST[bobsi\Settings::paramToken]) ? $_REQUEST[bobsi\Settings::paramToken] : FALSE;
 $ids = isset($_POST[bobsi\Settings::paramIds]) ? $_POST[bobsi\Settings::paramIds] : FALSE;
-$productStatus = isset($_POST[bobsi\Settings::paramProductStatus]) ? 
+$productStatus = isset($_POST[bobsi\Settings::paramProductStatus]) ?
     $_POST[bobsi\Settings::paramProductStatus] : FALSE;
+
+$excludededAttributes = array('Width', 'Height', 'Length');
+delete_transient('wc_attribute_taxonomies');
+foreach (wc_get_attribute_taxonomies() as $attribute) {
+    if (!$attribute->bobsi_attribute_flag) {
+        $excludededAttributes[] = $attribute->attribute_name;
+    }
+}
 
 $exportConfiguration = array(
     bobsi\Settings::paramIds => $ids,
     bobsi\Settings::paramProductStatus => $productStatus,
-    bobsi\Tradefeed::settingsNameExcludedAttributes => array('Width', 'Height', 'Length'),
+    bobsi\Tradefeed::settingsNameExcludedAttributes => $excludededAttributes,
     bobsi\Settings::paramCallbackGetProducts => 'bobsi_get_products',
     bobsi\Settings::paramCallbackGetBreadcrumb => 'bobsi_get_breadcrumb',
     bobsi\Settings::paramCallbackExportProducts => 'bobsi_export_products',
@@ -386,7 +400,7 @@ foreach ($plugins as $plugin) {
 if (bobsi_is_woo_currency_converter_active()) {
     $currency = bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getCurrency();
     if (!empty($currency)) {
-//        setcookie('wccc-currency', $currency, time() + (86400 * 365), '/');
+        //        setcookie('wccc-currency', $currency, time() + (86400 * 365), '/');
         $_COOKIE['wccc-currency'] = $currency;
     } else {
         unset($_COOKIE['wccc-currency']);

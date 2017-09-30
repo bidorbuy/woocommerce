@@ -2,6 +2,15 @@
 
 ### Changelog
 
+#### 2.0.13
+* Added possibility to include the attributes in product titles for the WooCommerce integrator.
+* Fixed an issue when export throws fatal error in case if WooCommerce is deactivated.
+* Fixed an issue when WooCommerce throws warning in case of deleting the attributes.
+* Fixed an issue when `Draft` and `Pending` products are missing in feed.
+* Corrected headers processing in Store Integrator core.
+
+_[Updated on September 30, 2017]_
+
 #### 2.0.12
 * Improved the logging strategy for Debug level.
 * Added extra save button which was removed from Debug section (the settings page).

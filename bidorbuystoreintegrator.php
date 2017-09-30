@@ -3,11 +3,12 @@
  * Plugin Name: bidorbuy Store Integrator
  * Plugin URI: www.bidorbuy.co.za
  * @codingStandardsIgnoreStart
- * Description: The bidorbuy store integrator allows you to get products from your online store listed on bidorbuy quickly and easily.
+ * Description: The bidorbuy store integrator allows you to get products from your online store listed on bidorbuy
+ * quickly and easily.
  * @codingStandardsIgnoreEnd
  * Author: bidorbuy
  * Author URI: www.bidorbuy.co.za
- * Version: 2.0.12
+ * Version: 2.0.13
  */
 
 /**
@@ -36,7 +37,7 @@ define('BOBSI_WOOCOMMERCE_PLUGIN_PHP_FILE', 'woocommerce/woocommerce.php');
 define('BOBSI_WOOCOMMERCE_PLUGIN_FILE', WP_PLUGIN_DIR . '/' . BOBSI_WOOCOMMERCE_PLUGIN_PHP_FILE);
 
 define('BOBSI_WOOCOMMERCE_CURRENCY_CONVERTER_PLUGIN_PHP_FILE',
-    'woocommerce-currency-converter/woocommerce-currency-converter.php');
+'woocommerce-currency-converter/woocommerce-currency-converter.php');
 define('BOBSI_WOOCOMMERCE_CURRENCY_CONVERTER_PLUGIN_FILE', WP_PLUGIN_DIR . '/'
     . BOBSI_WOOCOMMERCE_CURRENCY_CONVERTER_PLUGIN_PHP_FILE);
 
@@ -59,13 +60,7 @@ $dbSettings = array(bobsi\Db::SETTING_PREFIX => $wpdb->prefix, bobsi\Db::SETTING
     bobsi\Db::SETTING_USER => DB_USER, bobsi\Db::SETTING_PASS => DB_PASSWORD, bobsi\Db::SETTING_DBNAME => DB_NAME);
 
 bobsi\StaticHolder::getBidorbuyStoreIntegrator()
-    ->init(
-        get_bloginfo('name'),
-        get_bloginfo('admin_email'),
-        $platform,
-        get_option(bobsi\Settings::name),
-        $dbSettings
-    );
+    ->init(get_bloginfo('name'), get_bloginfo('admin_email'), $platform, get_option(bobsi\Settings::name), $dbSettings);
 
 require_once(dirname(__FILE__) . '/utils.php');
 require_once(dirname(__FILE__) . '/woo-currency-converter.php');
@@ -88,7 +83,20 @@ if (isset($_POST[bobsi\Settings::nameLoggingFormAction])) {
 }
 
 register_activation_hook(__FILE__, 'bobsi_plugin_activate');
-register_uninstall_hook(__FILE__, 'bobsi_plugin_uninstall');
+
+/**
+ * Check Woocommerce status plugin
+ *
+ * @return void  or exit if plugin doesn't install or disabled 
+ */
+function bobsi_check_woocommers_plugin() {
+    if (!is_plugin_active(BOBSI_WOOCOMMERCE_PLUGIN_PHP_FILE)) {
+        bobsi_exit_with_error(bobsi\Version::$name . ' requires <a href="http://www.woothemes.com/woocommerce/"
+            target="_blank">WooCommerce</a> to be activated. Please install and activate <a href="'
+            . admin_url('plugin-install.php?tab=search&type=term&s=WooCommerce')
+            . '" target="_blank">WooCommerce</a> first.');
+    }
+}
 
 /**
  * Plugin activate hook
@@ -103,16 +111,10 @@ function bobsi_plugin_activate() {
         bobsi_exit_with_error(implode('. ', $warnings));
     }
 
-    if (!is_plugin_active(BOBSI_WOOCOMMERCE_PLUGIN_PHP_FILE)) {
-        bobsi_exit_with_error(bobsi\Version::$name . ' requires <a href="http://www.woothemes.com/woocommerce/"
-            target="_blank">WooCommerce</a> to be activated. Please install and activate <a href="'
-            . admin_url('plugin-install.php?tab=search&type=term&s=WooCommerce')
-            . '" target="_blank">WooCommerce</a> first.');
-    }
+    bobsi_check_woocommers_plugin();
 
     if (!($wpdb->query(bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getQueries()->getInstallAuditTableQuery())
-        && $wpdb->query(bobsi\StaticHolder::getBidorbuyStoreIntegrator()
-            ->getQueries()->getInstallTradefeedTableQuery())
+        && $wpdb->query(bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getQueries()->getInstallTradefeedTableQuery())
         && $wpdb->query(bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getQueries()
             ->getInstallTradefeedDataTableQuery()))
     ) {
@@ -164,8 +166,8 @@ function bobsi_add_all_products_in_tradefeed_queue($update = FALSE) {
 function bobsi_get_all_products() {
     //    TODO: tax_query starts from 3.1, and As of 3.5, a bug was fixed where tax_query would
     // inadvertently return all posts when a result was empty.
-    $wpq = array('post_type' => 'product', 'fields' => 'ids');
-
+    $statuses = bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getExportStatuses();
+    $wpq = array('post_type' => 'product', 'fields' => 'ids', 'post_status' => $statuses);
     $wpq['posts_per_page'] = PHP_INT_MAX;
     $wpq['offset'] = 0;
 
@@ -189,6 +191,7 @@ function bobsi_plugin_uninstall() {
     delete_option(bobsi\Settings::name);
     delete_option('bobsi_first_activate');
     uninstall_update_settings();
+    bobsi_feature_4451_uninstall();
 }
 
 add_action('admin_init', 'bobsi_register_setting');
@@ -251,13 +254,11 @@ function bobsi_options() {
 
     //categories to include
     $export_categories = bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getExcludeCategories();
-    $included_categories =
-        '<select id="bobsi-inc-categories" class="bobsi-categories-select" name="bobsi_inc_categories[]" 
-            multiple="multiple" size="9">';
-    $excluded_categories =
-        '<select id="bobsi-exc-categories" class="bobsi-categories-select" name="excludeCategories[]"
-            multiple="multiple" size="9">';
-    $categories = bobsi_get_categories();
+    $included_categories = '<select id="bobsi-inc-categories" class="bobsi-categories-select"
+            name="bobsi_inc_categories[]" multiple="multiple" size="9">';
+    $excluded_categories = '<select id="bobsi-exc-categories" class="bobsi-categories-select" 
+            name="excludeCategories[]" multiple="multiple" size="9">';
+    $categories = bobsi_get_categories(['hide_empty' => 0]);
 
     $uncat = new stdClass();
     $uncat->term_id = 0;
@@ -356,7 +357,7 @@ function bobsi_admin_submit_form() {
             bobsi\Settings::nameExcludeCategories => 'categories', bobsi\Settings::nameExportStatuses => 'categories');
 
         $data = $_POST;
-        
+
         foreach ($settings_checklist as $setting => $prevalidation) {
             $presaved_settings[$setting] = bobsi_admin_prevalidation_settings($data, $setting, $prevalidation);
 
@@ -388,9 +389,7 @@ function bobsi_admin_submit_form() {
 
             $previousSettings = bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->serialize(TRUE);
 
-            bobsi\StaticHolder::getBidorbuyStoreIntegrator()
-                ->getSettings()
-                ->unserialize(serialize($presaved_settings));
+            bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->unserialize(serialize($presaved_settings));
 
             $newSettings = bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->serialize(TRUE);
 
@@ -401,9 +400,7 @@ function bobsi_admin_submit_form() {
             ) {
                 $wpdb->query(bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getQueries()->getTruncateJobsQuery());
 
-                $wpdb->query(bobsi\StaticHolder::getBidorbuyStoreIntegrator()
-                    ->getQueries()
-                    ->getTruncateProductQuery());
+                $wpdb->query(bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getQueries()->getTruncateProductQuery());
 
                 bobsi_add_all_products_in_tradefeed_queue(TRUE);
             }
@@ -421,8 +418,8 @@ function bobsi_admin_submit_form() {
 /**
  * Prevalidation settings
  *
- * @param array $data data from $_POST
- * @param string $setting setting
+ * @param array  $data          data from $_POST
+ * @param string $setting       setting
  * @param string $prevalidation rule
  *
  * @return mixed
@@ -493,8 +490,13 @@ function bobsi_plugin_check_update() {
         if (version_compare($database_version, '2.0.7', '<')) {
             plugin_update();
         }
+        if (version_compare($database_version, '2.0.12', '<')) {
+            bobsi_feature_4451_update();
+        }
     } else {
+        /**/
         plugin_update();
+        bobsi_feature_4451_update();
     }
 
 }
@@ -511,18 +513,6 @@ function plugin_update() {
     $query =
         "ALTER TABLE " . $wpdb->prefix . bobsi\Queries::TABLE_BOBSI_TRADEFEED . " ADD `images` text AFTER `image_url`";
     $wpdb->query($query);
-
-    $version = bobsi\Version::getVersionFromString(bobsi\Version::$version);
-    update_option('bobsi_db_version', $version);
-}
-
-/**
- * Uninstall Update Setting
- *
- * @return mixed
- */
-function uninstall_update_settings() {
-    return delete_option('bobsi_db_version');
 }
 
 /* Defect #4031 */
@@ -542,3 +532,160 @@ function bobsi_delete_css($href) {
 
     return $href;
 }
+
+
+/* View */
+add_action('woocommerce_after_add_attribute_fields', 'bobsi_woocommerce_after_add_attribute_fields');
+add_action('woocommerce_after_edit_attribute_fields', 'bobsi_woocommerce_after_edit_attribute_fields');
+add_action('woocommerce_after_product_attribute_settings', 'bobsi_woocommerce_after_product_attribute_settings', 10, 2);
+/* Actions */
+add_action('woocommerce_attribute_added', 'bobsi_woocommerce_attribute_added');
+add_action('woocommerce_attribute_updated', 'bobsi_woocommerce_attribute_updated');
+add_action('wp_ajax_woocommerce_save_attributes', 'bobsi_wp_ajax_woocommerce_save_attributes');
+define('BOBSI_WOOCOMMERCE_ATTRIBUTE_COLUMN', 'bobsi_attribute_flag');
+define('BOBSI_WOOCOMMERCE_ATTRIBUTE_FIELD', 'bobsi_attribute_field');
+
+/**
+ * Add checkbox on WooCommerce: Product->Attributes for new attributes
+ *
+ * @return void
+ */
+function bobsi_woocommerce_after_add_attribute_fields() {
+    echo "<div class='form-field'>
+          <label for='bobsi_attribute_field'>
+          <input name='" . BOBSI_WOOCOMMERCE_ATTRIBUTE_COLUMN . "' id='bobsi_attribute_field' type='checkbox' 
+                value='1' checked> Add this attribute to product name in bidorbuy tradefeed?</label>
+          <p class='description'>Enable if you want add this attribute to bidorbuy tradefeed product name.</p>
+          </div>
+         ";
+}
+
+/**
+ * Add checkbox on WooCommerce: Product->Attributes on edit page(update attribute)
+ *
+ * @return void
+ */
+function bobsi_woocommerce_after_edit_attribute_fields() {
+    global $wpdb;
+    $edit = absint($_GET['edit']);
+    $attribute = $wpdb->get_row("SELECT " . BOBSI_WOOCOMMERCE_ATTRIBUTE_COLUMN . " FROM " . $wpdb->prefix
+        . "woocommerce_attribute_taxonomies WHERE attribute_id = '$edit'");
+    $param = BOBSI_WOOCOMMERCE_ATTRIBUTE_COLUMN;
+    $flag = $attribute->$param;
+    echo "
+        <tr class='form-field form-required'>
+            <th scope='row' valign='top'>
+                <label for='bobsi_attribute_field'>Add this attribute to product name in bidorbuy tradefeed?</label>
+            </th>
+            <td>
+                 <input name='" . BOBSI_WOOCOMMERCE_ATTRIBUTE_COLUMN
+        . "' id='bobsi_attribute_field' type='checkbox' value='1' " . checked($flag, 1, 0) . ">
+                 <p class='description'>Enable if you want add this attribute to bidorbuy tradefeed product name.
+</p>
+            </td>
+        </tr>
+         ";
+}
+
+/**
+ * Add value for bobsi in woocommerce table after attribute added
+ *
+ * @param int $attribute_id attribute id
+ *
+ * @return void
+ */
+function bobsi_woocommerce_attribute_added($attribute_id) {
+    global $wpdb;
+    $attributeFlag = isset($_POST[BOBSI_WOOCOMMERCE_ATTRIBUTE_COLUMN]) ? $_POST[BOBSI_WOOCOMMERCE_ATTRIBUTE_COLUMN] : 0;
+    $wpdb->update($wpdb->prefix . 'woocommerce_attribute_taxonomies',
+        [BOBSI_WOOCOMMERCE_ATTRIBUTE_COLUMN => $attributeFlag], array('attribute_id' => $attribute_id));
+}
+
+/**
+ * Change value for bobsi in woocommerce table after attribute updated
+ *
+ * @param int $attribute_id attribute id
+ *
+ * @return void
+ */
+function bobsi_woocommerce_attribute_updated($attribute_id) {
+    global $wpdb;
+    $attributeFlag = isset($_POST[BOBSI_WOOCOMMERCE_ATTRIBUTE_COLUMN]) ? $_POST[BOBSI_WOOCOMMERCE_ATTRIBUTE_COLUMN] : 0;
+    $wpdb->update($wpdb->prefix . 'woocommerce_attribute_taxonomies',
+        [BOBSI_WOOCOMMERCE_ATTRIBUTE_COLUMN => $attributeFlag], array('attribute_id' => $attribute_id));
+}
+
+/* Custom Attributes */
+
+/**
+ * Add checkbox on WooCommerce: Product->Edit_Product->Attributes
+ *
+ * @param object $attribute Woocommerce attribute
+ * @param  int $i attribute array index
+ *
+ * @return void
+ */
+function bobsi_woocommerce_after_product_attribute_settings($attribute, $i) {
+    global $post;
+    $excludedAttributes = array_shift(get_post_meta($post->ID, '_' . BOBSI_WOOCOMMERCE_ATTRIBUTE_FIELD)) ?: array();
+
+    $checked = !in_array($attribute->get_name(), $excludedAttributes);
+    echo "
+        <tr>
+            <td>
+                <label>
+                    <input type='checkbox' class='checkbox' name='" . BOBSI_WOOCOMMERCE_ATTRIBUTE_FIELD . "[$i]' 
+                    value='1' " . checked($checked, 1, 0) . "> Add this attribute to product name in bidorbuy tradefeed
+                </label>
+            </td>
+        </tr>
+    ";
+}
+
+/**
+ * Update bobsi attribute field for product
+ *
+ * @return void
+ */
+function bobsi_wp_ajax_woocommerce_save_attributes() {
+    parse_str($_POST['data'], $data);
+    $product_id = absint($_POST['post_id']);
+    $exclutedAttributes = [];
+    $attributes = $data['attribute_names'];
+    foreach ($attributes as $key => $attribute) {
+        if (!isset($data[BOBSI_WOOCOMMERCE_ATTRIBUTE_FIELD][$key])) {
+            $exclutedAttributes[] = $attribute;
+        }
+    }
+    update_post_meta($product_id, '_' . BOBSI_WOOCOMMERCE_ATTRIBUTE_FIELD, $exclutedAttributes);
+}
+
+/**
+ * Update function for plugin.
+ * Add new bobsi column for woocommerce table
+ *
+ * @return mixed
+ */
+function bobsi_feature_4451_update() {
+    global $wpdb;
+    $result = $wpdb->query("ALTER TABLE `" . $wpdb->prefix . "woocommerce_attribute_taxonomies` ADD `"
+        . BOBSI_WOOCOMMERCE_ATTRIBUTE_COLUMN . "` TINYINT(1) NULL DEFAULT '1' AFTER `attribute_public`");
+    $version = bobsi\Version::getVersionFromString(bobsi\Version::$version);
+    update_option('bobsi_db_version', $version);
+
+    return $result;
+}
+
+/**
+ * Delete bobsi column in woocommerce table
+ *
+ * @return mixed
+ */
+function bobsi_feature_4451_uninstall() {
+    global $wpdb;
+    $result = $wpdb->query("ALTER TABLE `" . $wpdb->prefix . "woocommerce_attribute_taxonomies` DROP `"
+        . BOBSI_WOOCOMMERCE_ATTRIBUTE_COLUMN . "`");
+
+    return $result;
+}
+

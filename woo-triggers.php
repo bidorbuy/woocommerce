@@ -86,10 +86,10 @@ function bobsi_product_bulk_or_quick_update($product) {
  */
 function bobsi_attribute_updated($attr_id, $attr) {
     global $wpdb;
-
+    $attr = isset($attr['attribute_name']) ? $attr['attribute_name'] : $attr;
     $pids = bobsi_get_products_ids_by_attr_values(
-        $attr['attribute_name'],
-        get_terms('pa_' . $attr['attribute_name'], array('fields' => 'names'))
+        $attr,
+        get_terms('pa_' . $attr, array('fields' => 'names', 'hide_empty' => 0))
     );
 
     foreach ($pids as $pid) {

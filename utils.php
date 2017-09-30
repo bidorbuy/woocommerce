@@ -65,7 +65,7 @@ function bobsi_exit_with_error($message, $type = 'error', $exit = TRUE) {
 function bobsi_get_export_categories_ids($ids = array()) {
     $uncategorized = in_array(0, $ids);
 
-    $args = array('hide_empty' => 1);
+    $args = array('hide_empty' => 0);
 
     if (!empty($ids)) {
         $args['exclude'] = $ids;

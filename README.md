@@ -2,9 +2,12 @@
 
 ### Compatibility
 
-Requires at least: WordPress 3.5
-
-Tested up to:  WordPress 4.5
+|         Product         |     WordPress 4.3   |      WordPress 4.4   | WordPress 4.5.3     | WordPress 4.7.2      |  PHP version   |
+|         -------         |          ---        |         ---          |       ---           |        ---           |      ---       |
+| Store Integrator-2.0.13 | ✓ WooCommerce 2.4.6 | ✓ WooCommerce 2.4.8 | ✓ WooCommerce 2.5.5 | ✓ WooCommerce  3.1.1 | 5.4,  5.6,  7.0|
+| Store Integrator-2.0.12 | ✓ WooCommerce 2.4.6 | ✓ WooCommerce 2.4.8 | ✓ WooCommerce 2.5.5 | ✓ WooCommerce  3.1.1 | 5.4,  5.6,  7.0|
+| Store Integrator-2.0.11 | ✓ WooCommerce 2.4.6 | ✓ WooCommerce 2.4.8 | ✓ WooCommerce 2.5.5 |         ×            | 5.4            |
+| Store Integrator-2.0.10 | ✓ WooCommerce 2.4.6 | ✓ WooCommerce 2.4.8 | ✓ WooCommerce 2.5.5 |         ×            | 5.3            | 
 
 ### Description
 The bidorbuy Store Integrator allows you to get products from your online store listed on bidorbuy quickly and easily.
@@ -17,7 +20,7 @@ To make use of this plugin, you'll need to be an advanced seller on bidorbuy.
 
 ### System requirements
 
-Supported PHP versions: 5.4 (5.6, 7.0 for WooCommerce 3.1.1)
+Supported PHP versions: 5.4 (5.6, 7.0 for WooCommerce 3.1.1 only)
 
 PHP extensions: curl, mbstring
 
@@ -51,3 +54,10 @@ Remove all old files of previous installation:
 6. Press the `Download` button.
 7. Share Export Links with "bidorbuy".
 8. To display BAA fields on the setting page add '&baa=1' to URL in address bar.
+9. To include attribute name to product title set an appropriate checkbox to Yes:
+
+For Global attributes - is configuring on attributes page (WooCoommerce > Products > Attributes page > Add new/Edit Attribute > Add this attribute to product name in bidorbuy Store Integrator tradefeed > Yes).
+
+For Custom attributes - is configuring on a product page (Woo Commerce > Product > Attributes > Add this attribute to product name in bidorbuy Store Integrator tradefeed > Yes).
+
+Note please: this feature supports WooCommerce 3.0.0 and higher!

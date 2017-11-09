@@ -8,7 +8,7 @@
  * @codingStandardsIgnoreEnd
  * Author: bidorbuy
  * Author URI: www.bidorbuy.co.za
- * Version: 2.0.13
+ * Version: 2.0.14
  */
 
 /**
@@ -627,7 +627,8 @@ function bobsi_woocommerce_attribute_updated($attribute_id) {
  */
 function bobsi_woocommerce_after_product_attribute_settings($attribute, $i) {
     global $post;
-    $excludedAttributes = array_shift(get_post_meta($post->ID, '_' . BOBSI_WOOCOMMERCE_ATTRIBUTE_FIELD)) ?: array();
+    $postMeta = get_post_meta($post->ID, '_' . BOBSI_WOOCOMMERCE_ATTRIBUTE_FIELD);
+    $excludedAttributes = array_shift($postMeta) ?: array();
 
     $checked = !in_array($attribute->get_name(), $excludedAttributes);
     echo "

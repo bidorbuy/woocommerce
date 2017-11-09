@@ -4,6 +4,7 @@
 
 |         Product         |     WordPress 4.3   |      WordPress 4.4   | WordPress 4.5.3     | WordPress 4.7.2      |  PHP version   |
 |         -------         |          ---        |         ---          |       ---           |        ---           |      ---       |
+| Store Integrator-2.0.14 | ✓ WooCommerce 2.4.6 | ✓ WooCommerce 2.4.8 | ✓ WooCommerce 2.5.5 | ✓ WooCommerce  3.1.1 | 5.4,  5.6,  7.0|
 | Store Integrator-2.0.13 | ✓ WooCommerce 2.4.6 | ✓ WooCommerce 2.4.8 | ✓ WooCommerce 2.5.5 | ✓ WooCommerce  3.1.1 | 5.4,  5.6,  7.0|
 | Store Integrator-2.0.12 | ✓ WooCommerce 2.4.6 | ✓ WooCommerce 2.4.8 | ✓ WooCommerce 2.5.5 | ✓ WooCommerce  3.1.1 | 5.4,  5.6,  7.0|
 | Store Integrator-2.0.11 | ✓ WooCommerce 2.4.6 | ✓ WooCommerce 2.4.8 | ✓ WooCommerce 2.5.5 |         ×            | 5.4            |

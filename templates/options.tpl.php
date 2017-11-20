@@ -23,10 +23,7 @@ $wordings = $bobsi_settings->getDefaultWordings();
 $warnings = array_merge(bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getWarnings(),
     bobsi\StaticHolder::getWarnings()->getBusinessWarnings());
 // @codingStandardsIgnoreStart
-$warnings[] = '<b style="color: red">bidorbuy Store Integrator warning:</b>
-               to improve plugin security the export/download link structure will be changed from 
-               Store Integrator 2.0.15 version and higher. 
-               <b>Please ensure you have provided updated links to bidorbuy.</b>';
+
 foreach ($warnings as $warning): ?>
 
     <div class="error">

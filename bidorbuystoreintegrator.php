@@ -3,12 +3,11 @@
  * Plugin Name: bidorbuy Store Integrator
  * Plugin URI: www.bidorbuy.co.za
  * @codingStandardsIgnoreStart
- * Description: The bidorbuy store integrator allows you to get products from your online store listed on bidorbuy.
- * quickly and easily.
+ * Description: The bidorbuy store integrator allows you to get products from your online store listed on bidorbuy quickly and easily.
  * @codingStandardsIgnoreEnd
  * Author: bidorbuy
  * Author URI: www.bidorbuy.co.za
- * Version: 2.0.15
+ * Version: 2.1.0
  */
 
 /**
@@ -73,7 +72,7 @@ require_once(dirname(__FILE__) . '/woo-commerce.php');
 if (isset($_POST[bobsi\Settings::nameLoggingFormAction])) {
     $data = array(bobsi\Settings::nameLoggingFormFilename => (isset($_POST[bobsi\Settings::nameLoggingFormFilename]))
         ? sanitize_text_field($_POST[bobsi\Settings::nameLoggingFormFilename]) : '');
-    
+
     $result = bobsi\StaticHolder::getBidorbuyStoreIntegrator()
         ->processAction(sanitize_text_field($_POST[bobsi\Settings::nameLoggingFormAction]), $data);
 
@@ -117,7 +116,7 @@ function bobsi_plugin_activate() {
     }
 
     bobsi_check_woocommers_plugin();
-
+    
     if (!($wpdb->query(bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getQueries()->getInstallAuditTableQuery())
         && $wpdb->query(bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getQueries()->getInstallTradefeedTableQuery())
         && $wpdb->query(bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getQueries()
@@ -288,14 +287,18 @@ function bobsi_options() {
 
     $zip_loaded = array_key_exists('zip',
         bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getCompressLibraryOptions());
-    $export_link = site_url() . '/' .BOBSI_ENDPOINT_NAMESPACE . '/export/'
-        . bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getTokenExport();
-    $download_link =site_url() . '/' .BOBSI_ENDPOINT_NAMESPACE . '/download/'
-        . bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getTokenDownload();
-    $resetaudit_link =site_url() . '/' .BOBSI_ENDPOINT_NAMESPACE . '/resetaudit/'
-        . bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getTokenDownload();
-    $phpInfo_link = site_url() . '/' .BOBSI_ENDPOINT_NAMESPACE . '/version/'
-        . bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getTokenDownload() . '&phpinfo=y';
+    $export_link = bobsi_generate_action_url('export',
+        bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getTokenExport()
+    );
+    $download_link = bobsi_generate_action_url('download',
+        bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getTokenDownload()
+    );
+    $resetaudit_link =bobsi_generate_action_url('resetaudit',
+        bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getTokenDownload()
+    );
+    $phpInfo_link = bobsi_generate_action_url('version',
+        bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getTokenDownload() . '&phpinfo=y'
+    );
     $logfiles_table = bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getLogsHtml();
     $tooltip_img_url = plugins_url('assets/images/tooltip.png', __FILE__);
     $bob_logo_url = plugins_url('assets/images/bidorbuy.png', __FILE__);
@@ -495,7 +498,7 @@ add_action('plugins_loaded', 'bobsi_plugin_check_update');
 function bobsi_plugin_check_update() {
 
     $database_version = get_option('bobsi_db_version');
-
+    
     if ($database_version) {
         if (version_compare($database_version, '2.0.7', '<')) {
             plugin_update();
@@ -503,12 +506,17 @@ function bobsi_plugin_check_update() {
         if (version_compare($database_version, '2.0.12', '<')) {
             bobsi_feature_4451_update();
         }
+        if (version_compare($database_version, '2.0.15', '<')) {
+            update_option('bobsi_show_admin_notices', 1);
+        }
     } else {
         /**/
         plugin_update();
         bobsi_feature_4451_update();
     }
 
+    $version = bobsi\Version::getVersionFromString(bobsi\Version::$version);
+    update_option('bobsi_db_version', $version);
 }
 
 /**
@@ -681,9 +689,6 @@ function bobsi_feature_4451_update() {
     global $wpdb;
     $result = $wpdb->query("ALTER TABLE `" . $wpdb->prefix . "woocommerce_attribute_taxonomies` ADD `"
         . BOBSI_WOOCOMMERCE_ATTRIBUTE_COLUMN . "` TINYINT(1) NULL DEFAULT '1' AFTER `attribute_public`");
-    $version = bobsi\Version::getVersionFromString(bobsi\Version::$version);
-    update_option('bobsi_db_version', $version);
-
     return $result;
 }
 
@@ -752,3 +757,62 @@ function bobsi_init_endpoint($query) {
 }
 
 add_action('pre_get_posts', 'bobsi_init_endpoint');
+
+/**
+ * Generate action url
+ *
+ * @param string $action action
+ * @param string $token token
+ *
+ * @return string
+ */
+function bobsi_generate_action_url($action, $token) {
+    $siteUrl = site_url();
+    if (get_option('permalink_structure')) {
+        // pretty links
+        return  "{$siteUrl}/" . BOBSI_ENDPOINT_NAMESPACE . "/{$action}/{$token}";
+    }
+    return "$siteUrl?" . BOBSI_ENDPOINT_NAMESPACE . "={$action}/{$token}";
+}
+
+/**
+ * Show Dashboard Warning.
+ *
+ * @return void
+ */
+function bobsi_new_urls_warning() {
+    if (isset($_POST['bobsi_close_admin_notice'])) {
+        delete_option('bobsi_show_admin_notices');
+        delete_transient('bobsi_show_admin_notices');
+        return;
+    }
+    $message = '<h3><b style="color: red">bidorbuy Store Integrator warning:</b>
+               to improve plugin security the export/download link structure will be changed from 
+               Store Integrator 2.0.15 version and higher. 
+               <b>Please ensure you have provided updated links to bidorbuy.</b></h3>';
+    echo "
+        <div id='bobsi_admin_warning' class='error notice'>
+            $message
+            <p>
+            <div align='right'>
+            <form method='post'>
+                <input type='submit' name='bobsi_close_admin_notice' value='Close'>            
+            </form> 
+            </div>
+            </p>
+        </div>
+        <script>
+        jQuery(document).ready(function() {
+          (function blink() { 
+                jQuery('#bobsi_admin_warning').fadeOut(500).fadeIn(5000, blink); 
+            })();  
+        })
+            
+        </script>        
+    ";
+}
+
+
+if (get_option('bobsi_show_admin_notices')) {
+    add_action('admin_notices', 'bobsi_new_urls_warning');
+}

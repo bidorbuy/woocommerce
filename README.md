@@ -4,16 +4,18 @@ bidorbuy Store Integrator warning: to improve plugin security the export/downloa
 
 ### Compatibility
 
-|         Product         |     WordPress 4.3   |      WordPress 4.4   | WordPress 4.5.3     | WordPress 4.7.2      |  PHP version   |
-|         -------         |          ---        |         ---          |       ---           |        ---           |      ---       |
-| Store Integrator-2.0.15 | ×  | ×  | ×  | ✓ WooCommerce  3.0, 3.1, 3.2 | 5.4,  5.6 |
-| Store Integrator-2.0.14 | ✓ WooCommerce 2.4.6 | ✓ WooCommerce 2.4.8 | ✓ WooCommerce 2.5.5 | ✓ WooCommerce  3.0, 3.1, 3.2 | 5.4,  5.6|
-| Store Integrator-2.0.13 | ✓ WooCommerce 2.4.6 | ✓ WooCommerce 2.4.8 | ✓ WooCommerce 2.5.5 | ✓ WooCommerce  3.0, 3.1, 3.2 | 5.4,  5.6|
-| Store Integrator-2.0.12 | ✓ WooCommerce 2.4.6 | ✓ WooCommerce 2.4.8 | ✓ WooCommerce 2.5.5 | ✓ WooCommerce  3.0, 3.1, 3.2 | 5.4,  5.6|
-| Store Integrator-2.0.11 | ✓ WooCommerce 2.4.6 | ✓ WooCommerce 2.4.8 | ✓ WooCommerce 2.5.5 |         ×            | 5.4            |
-| Store Integrator-2.0.10 | ✓ WooCommerce 2.4.6 | ✓ WooCommerce 2.4.8 | ✓ WooCommerce 2.5.5 |         ×            | 5.3            | 
+   Product         | PHP version   |     WordPress 4.3      |      WordPress 4.4     |    WordPress 4.5.3     |    WordPress 4.7.2      |    WordPress 4.8.3   |  
+|         -------         |       ---     |          ---           |         ---            |       ---              |        ---              |      ---             |     
+| Store Integrator-2.1.0  |5.4,  5.6      | ✓ WooCommerce 2.4.6 + | ✓ WooCommerce 2.4.8 +  | ✓ WooCommerce 2.5.5 +  | ✓ WooCommerce 3.1.1   | ✓ WooCommerce 3.2.1 |  
+ Store Integrator-2.0.15 |5.4,  5.6      |  ×   | ×     | ×     | ✓ WooCommerce  3.0 +  | ×                    |
+| Store Integrator-2.0.14 |5.4,  5.6      | ✓ WooCommerce 2.4.6   | ✓ WooCommerce 2.4.8    | ✓ WooCommerce 2.5.5    | ✓ WooCommerce  3.0 +  | ×                    |
+| Store Integrator-2.0.13 |5.4,  5.6      | ✓ WooCommerce 2.4.6   | ✓ WooCommerce 2.4.8    | ✓ WooCommerce 2.5.5    | ✓ WooCommerce  3.0 +  | ×                    |  
+| Store Integrator-2.0.12 |5.4,  5.6      | ✓ WooCommerce 2.4.6   | ✓ WooCommerce 2.4.8    | ✓ WooCommerce 2.5.5    | ✓ WooCommerce  3.0 +  | ×                    |
+| Store Integrator-2.0.11 |5.4            | ✓ WooCommerce 2.4.6   | ✓ WooCommerce 2.4.8    | ✓ WooCommerce 2.5.5    |         ×              | ×                    |
+| Store Integrator-2.0.10 |5.3            | ✓ WooCommerce 2.4.6   | ✓ WooCommerce 2.4.8    | ✓ WooCommerce 2.5.5    |         ×              | ×                    |
 
 ### Description
+
 The bidorbuy Store Integrator allows you to get products from your online store listed on bidorbuy quickly and easily.
 Expose your products to the bidorbuy audience - one of the largest audiences of online shoppers in South Africa Store updates will be fed through to bidorbuy automatically, within 24 hours so you can be sure that your store is in sync within your bidorbuy listings. All products will appear as Buy Now listings. There is no listing fee just a small commission on successful sales. View [fees](https://support.bidorbuy.co.za/index.php?/Knowledgebase/Article/View/22/0/fee-rate-card---what-we-charge). Select as many product categories to list on bidorbuy as you like. No technical requirements necessary.
 
@@ -28,13 +30,14 @@ Supported PHP versions: 5.4 (5.6, 7.0 for WooCommerce 3.1.1 only)
 
 PHP extensions: curl, mbstring
 
+WooCommerce: 2.4.6 and higher
+
 ### Installation
 
 1. Log in to control panel as administrator.
 2. Go to Plugins > Add New > press Upload Plugin button.
 3. Upload `bidorbuy Store Integrator` archive (do not unpack the archive).
 4. Activate the plugin through the 'Plugins' menu in WordPress.
-5. Enable pretty permalinks in Settings > Permalinks (default permalinks will not work).
 
 ### Uninstallation
 
@@ -64,5 +67,3 @@ To include attribute name to product title set an appropriate checkbox to Yes:
 
 - For Global attributes - is configuring on attributes page (WooCoommerce > Products > Attributes page > Add new/Edit Attribute > Add this attribute to product name in bidorbuy Store Integrator tradefeed > Yes).
 - For Custom attributes - is configuring on a product page (Woo Commerce > Product > Attributes > Add this attribute to product name in bidorbuy Store Integrator tradefeed > Yes).
-
-Note please: this feature supports WooCommerce 3.0.0 and higher!

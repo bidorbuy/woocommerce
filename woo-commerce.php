@@ -95,8 +95,8 @@ function bobsi_woo_commerce_get_possible_variations($_product, $variations) {
 
     foreach ($_product->get_children() as $child_id) {
         $child = wc_get_product($child_id);
-
-        if (!empty($child->get_id())) {
+        $id = bobsi_helper_get_product_id($child);
+        if (!empty($id)) {
             $available_variations[] = $child->get_variation_attributes();
         }
     }

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014, 2015, 2016 Bidorbuy http://www.bidorbuy.co.za
  * This software is the proprietary information of Bidorbuy.
@@ -12,9 +11,11 @@
  * Vendor: EXTREME IDEA LLC http://www.extreme-idea.com
  */
 
-use com\extremeidea\bidorbuy\storeintegrator\core as bobsi;
+if (!defined('ABSPATH')) {
+    exit;// Exit if accessed directly
+}
 
-require_once(dirname(__FILE__) . '/../../../wp-config.php');
+use com\extremeidea\bidorbuy\storeintegrator\core as bobsi;
 
 bobsi_check_woocommers_plugin();
 
@@ -49,7 +50,7 @@ function bobsi_get_breadcrumb($categoryId) {
  *
  * @return int
  */
-function bobsi_calc_product_quantity(WC_Product &$product, $default = 0) {
+function bobsi_calc_product_quantity(WC_Product $product, $default = 0) {
     $qty = intval($product->get_stock_quantity());
     return ($product->managing_stock()) ? $qty : ($product->is_in_stock() ? $default : 0);
 }
@@ -63,23 +64,25 @@ function bobsi_calc_product_quantity(WC_Product &$product, $default = 0) {
  *
  * @return array
  */
-function &bobsi_build_export_product(&$product, $variations = array(), $categories = array()) {
+function bobsi_build_export_product($product, $variations = array(), $categories = array()) {
     $exportedProduct = array();
 
-    $sku = $product->id;
-    if ($product instanceof WC_Product_Variation) {
-        $exportedProduct[bobsi\Settings::paramVariationId] = $product->variation_id;
-        $sku .= '-' . $product->variation_id;
-    }
-    $sku .= ($product->get_sku() != '') ? '-' . $product->get_sku() : '';
-
-    $exportedProduct[bobsi\Tradefeed::nameProductId] = $product->id;
+    $sku = $product->get_id();
+    $exportedProduct[bobsi\Tradefeed::nameProductId] = $product->get_id();
     $exportedProduct[bobsi\Tradefeed::nameProductName] = $product->get_title();
+
+    if ($product instanceof WC_Product_Variation) {
+        $exportedProduct[bobsi\Settings::paramVariationId] = $product->get_id();
+        $exportedProduct[bobsi\Tradefeed::nameProductId] = $product->get_parent_id();
+        $sku =$product->get_parent_id() . '-' . $product->get_id();
+    }
+
+    $sku .= ($product->get_sku() != '') ? '-' . $product->get_sku() : '';
     $exportedProduct[bobsi\Tradefeed::nameProductCode] = $sku;
 
     if ($product->is_on_sale()) {
         $exportedProduct[bobsi\Tradefeed::nameProductPrice] = bobsi_convert_price(
-            (double)$product->get_price_including_tax()
+            (double)wc_get_price_including_tax($product)
         );
 
         //Is it real sale?
@@ -87,7 +90,7 @@ function &bobsi_build_export_product(&$product, $variations = array(), $categori
             $price = $product->get_price();
             $product->set_price($product->regular_price);
             $exportedProduct[bobsi\Tradefeed::nameProductMarketPrice] = bobsi_convert_price(
-                (double)$product->get_price_including_tax()
+                (double)wc_get_price_including_tax($product)
             );
 
             $product->set_price($price);
@@ -96,7 +99,7 @@ function &bobsi_build_export_product(&$product, $variations = array(), $categori
         }
     } else {
         $exportedProduct[bobsi\Tradefeed::nameProductPrice] = bobsi_convert_price(
-            (double)$product->get_price_including_tax()
+            (double)wc_get_price_including_tax($product)
         );
 
         $exportedProduct[bobsi\Tradefeed::nameProductMarketPrice] = '';
@@ -109,36 +112,36 @@ function &bobsi_build_export_product(&$product, $variations = array(), $categori
 
     $exportedProduct[bobsi\Tradefeed::nameProductShippingClass] =
         ($product instanceof WC_Product_Variation) ?
-            bobsi_get_shipping_class($product->variation_id, $product->parent->id)
-            : bobsi_get_shipping_class($product->id);
+            bobsi_get_shipping_class($product->get_id(), $product->get_parent_id())
+            : bobsi_get_shipping_class($product->get_id());
 
     if (isset($variations['attributes'])) {
         foreach ($variations['attributes'] as $key => $value) {
             $exportedProduct[bobsi\Tradefeed::nameProductAttributes][$key] = $value;
         }
     }
-    $exclAttr = get_post_meta($product->id, '_' . BOBSI_WOOCOMMERCE_ATTRIBUTE_FIELD);
+    $exclAttr = get_post_meta($product->get_id(), '_' . BOBSI_WOOCOMMERCE_ATTRIBUTE_FIELD);
     $excludedAttributes = array_shift($exclAttr) ?: array();
     $excludedAttributes = array_map('bobsi_attribute_label', $excludedAttributes);
     $exportedProduct[bobsi\Tradefeed::nameProductExcludedAttributes] = $excludedAttributes;
 
-    if ($product->width) {
+    if ($product->get_width()) {
         $exportedProduct[bobsi\Tradefeed::nameProductAttributes][bobsi\Tradefeed::nameProductAttrWidth] =
-            number_format($product->width, 2, '.', '');
+            number_format($product->get_width(), 2, '.', '');
         //        $exportedProduct[bobsi\Tradefeed::nameProductAttributes][bobsi\Tradefeed::nameProductAttrWidth] =
         // intval($product->width);
     }
 
-    if ($product->height) {
+    if ($product->get_height()) {
         $exportedProduct[bobsi\Tradefeed::nameProductAttributes][bobsi\Tradefeed::nameProductAttrHeight] =
-            number_format($product->height, 2, '.', '');
+            number_format($product->get_height(), 2, '.', '');
         //        $exportedProduct[bobsi\Tradefeed::nameProductAttributes][bobsi\Tradefeed::nameProductAttrHeight] =
         // intval($product->height);
     }
 
-    if ($product->length) {
+    if ($product->get_length()) {
         $exportedProduct[bobsi\Tradefeed::nameProductAttributes][bobsi\Tradefeed::nameProductAttrLength] =
-            number_format($product->length, 2, '.', '');
+            number_format($product->get_length(), 2, '.', '');
         //        $exportedProduct[bobsi\Tradefeed::nameProductAttributes][bobsi\Tradefeed::nameProductAttrLength] =
         // intval($product->length);
     }
@@ -157,17 +160,18 @@ function &bobsi_build_export_product(&$product, $variations = array(), $categori
 
     //Image of the variation has Priority 1. If there is no image in the variation - get the image of the product.
     $image = FALSE;
+    $productId = $product->get_id();
     if ($product instanceof WC_Product_Variation) {
-        $image = wp_get_attachment_url(get_post_thumbnail_id($product->variation_id));
+        $image = wp_get_attachment_url(get_post_thumbnail_id($product->get_id()));
+        $productId = $product->get_parent_id();
     }
-    $image = $image ? $image : wp_get_attachment_url(get_post_thumbnail_id($product->id));
-
+    $image = $image ? $image : wp_get_attachment_url(get_post_thumbnail_id($productId));
     if ($image) {
         $exportedProduct[bobsi\Tradefeed::nameProductImageURL] = $image;
     }
     $images = $image ? array($image) : array();
 
-    $attachment_ids = $product->get_gallery_attachment_ids();
+    $attachment_ids = $product->get_gallery_image_ids();
     foreach ($attachment_ids as $attachment_id) {
         //Get URL of Gallery Images - default wordpress image sizes
         $images[] = wp_get_attachment_url($attachment_id);
@@ -213,12 +217,12 @@ function bobsi_export_products($id, $available_variations = array()) {
     $exportVisibilities = bobsi\StaticHolder::getBidorbuyStoreIntegrator()
         ->getSettings()->getExportVisibilities();
 
-    $product = function_exists('wc_get_product') ? wc_get_product($id) : get_product($id);
+    $product = wc_get_product($id);
     bobsi\StaticHolder::getBidorbuyStoreIntegrator()->logInfo('Processing product id: ' . $id);
 
     if (count(bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getExportStatuses()) == 0
         or !in_array(
-            $product->post->post_status,
+            get_post($product->get_id())->post_status,
             bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getExportStatuses())
     ) {
         return $exportedProducts;
@@ -228,7 +232,7 @@ function bobsi_export_products($id, $available_variations = array()) {
         ->getSettings()->getExcludeCategories());
 
     $productCategories = wp_get_object_terms(($product instanceof WC_Product_Variation)
-        ? $product->parent->id
+        ? $product->get_parent_id()
         : $id, 'product_cat', array('fields' => 'ids'));
     if (empty($productCategories)) {
         $productCategories[] = 0;
@@ -239,14 +243,15 @@ function bobsi_export_products($id, $available_variations = array()) {
         return $exportedProducts;
     }
 
-    $productVisibility = $product->post->post_password ? 'protected' : 'visible';
+    $productVisibility = get_post($product->get_id())->post_password ? 'protected' : 'visible';
     if (!empty($exportVisibilities) && !in_array($productVisibility, $exportVisibilities)) {
         return $exportedProducts;
     }
 
     if (!($product instanceof WC_Product_Variation)) {
-        $exportedProducts[bobsi\Tradefeed::nameProductSummary] = $product->get_post_data()->post_excerpt;
-        $exportedProducts[bobsi\Tradefeed::nameProductDescription] = $product->get_post_data()->post_content;
+        $postData = get_post($product->get_id());
+        $exportedProducts[bobsi\Tradefeed::nameProductSummary] = $postData->post_excerpt;
+        $exportedProducts[bobsi\Tradefeed::nameProductDescription] = $postData->post_content;
     }
 
     if ($product instanceof WC_Product_Variable) {
@@ -261,7 +266,7 @@ function bobsi_export_products($id, $available_variations = array()) {
         }
     } else if (($product instanceof WC_Product_Simple || $product instanceof WC_Product_Variation)) {
         $attributes = $product instanceof WC_Product_Variation ?
-            $product->parent->get_attributes() : $product->get_attributes();
+            wc_get_product($product->get_parent_id())->get_attributes() : $product->get_attributes();
 
         $attributes_variations = $product instanceof WC_Product_Variation ?
             $product->get_variation_attributes() : array();
@@ -312,7 +317,7 @@ function bobsi_build_export_product_helper($product, $variations, $categoriesMat
         $exportedProducts[] = $p;
     } else {
         bobsi\StaticHolder::getBidorbuyStoreIntegrator()
-            ->logInfo('Product price <= 0, skipping, product id: ' . $product->id);
+            ->logInfo('Product price <= 0, skipping, product id: ' . $product->get_id());
     }
 }
 /**
@@ -324,7 +329,7 @@ function bobsi_build_export_product_helper($product, $variations, $categoriesMat
  *
  * @return array
  */
-function bobsi_get_sorted_attributes($attributes_variations, $attributes, &$product) {
+function bobsi_get_sorted_attributes($attributes_variations, $attributes, $product) {
     $variations = array();
     //Order of attrs: variations should come first in tradefeed.
     foreach ($attributes_variations as $attr_var_key => $attr_var_val) {
@@ -360,7 +365,9 @@ function bobsi_attribute_label($name) {
     return $name;
 }
 
-$token = isset($_REQUEST[bobsi\Settings::paramToken]) ? $_REQUEST[bobsi\Settings::paramToken] : FALSE;
+$token = isset($_REQUEST[bobsi\Settings::paramToken]) ?
+    sanitize_text_field($_REQUEST[bobsi\Settings::paramToken]) : FALSE;
+
 $ids = isset($_POST[bobsi\Settings::paramIds]) ? $_POST[bobsi\Settings::paramIds] : FALSE;
 $productStatus = isset($_POST[bobsi\Settings::paramProductStatus]) ?
     $_POST[bobsi\Settings::paramProductStatus] : FALSE;

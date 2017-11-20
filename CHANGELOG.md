@@ -2,6 +2,11 @@
 
 ### Changelog
 
+#### 2.0.15
+* Adopted plugin according to wordpress.org rules.
+
+_[Updated on November 14, 2017]_
+
 #### 2.0.14
 * Reporting each Reset Audit effort as an extra notification in a log file (only for Debug logging level).
 

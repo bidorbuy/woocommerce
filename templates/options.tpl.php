@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014, 2015, 2016 Bidorbuy http://www.bidorbuy.co.za
  * This software is the proprietary information of Bidorbuy.
@@ -12,6 +11,10 @@
  * Vendor: EXTREME IDEA LLC http://www.extreme-idea.com
  */
 
+if (!defined('ABSPATH')) {
+    exit;// Exit if accessed directly
+}
+
 use com\extremeidea\bidorbuy\storeintegrator\core as bobsi;
 
 $bobsi_settings = new bobsi\Settings();
@@ -20,6 +23,10 @@ $wordings = $bobsi_settings->getDefaultWordings();
 $warnings = array_merge(bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getWarnings(),
     bobsi\StaticHolder::getWarnings()->getBusinessWarnings());
 // @codingStandardsIgnoreStart
+$warnings[] = '<b style="color: red">bidorbuy Store Integrator warning:</b>
+               to improve plugin security the export/download link structure will be changed from 
+               Store Integrator 2.0.15 version and higher. 
+               <b>Please ensure you have provided updated links to bidorbuy.</b>';
 foreach ($warnings as $warning): ?>
 
     <div class="error">
@@ -211,7 +218,7 @@ foreach ($warnings as $warning): ?>
 
                 <!-- Feature 3910 -->
                 <?php
-                $baa = isset($_REQUEST['baa']) ? $_REQUEST['baa'] : FALSE;
+                $baa = isset($_REQUEST['baa']) ? (int)$_REQUEST['baa'] : FALSE;
                 if ($baa == 1) :
 
                     ?>

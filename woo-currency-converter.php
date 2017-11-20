@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014, 2015, 2016 Bidorbuy http://www.bidorbuy.co.za
  * This software is the proprietary information of Bidorbuy.
@@ -10,6 +9,10 @@
  *
  * Vendor: EXTREME IDEA LLC http://www.extreme-idea.com
  */
+
+if (!defined('ABSPATH')) {
+    exit;// Exit if accessed directly
+}
 
 use com\extremeidea\bidorbuy\storeintegrator\core as bobsi;
 

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2014, 2015, 2016 Bidorbuy http://www.bidorbuy.co.za
  * This software is the proprietary information of Bidorbuy.
@@ -11,6 +10,10 @@
  *
  * Vendor: EXTREME IDEA LLC http://www.extreme-idea.com
  */
+
+if (!defined('ABSPATH')) {
+    exit;// Exit if accessed directly
+}
 
 /**
  * Get all variations.
@@ -28,10 +31,7 @@ function &bobsi_woo_commerce_get_all_variations($post_id) {
     }
 
     $variations = array();
-
-    $variations = array();
-    $args = array('product_type' => 'variable');
-    $_product = get_product($post_id, $args);
+    $_product = wc_get_product($post_id);
 
     // Put variation attributes into an array
     foreach ($_product->get_attributes() as $attribute) {
@@ -94,9 +94,9 @@ function bobsi_woo_commerce_get_possible_variations($_product, $variations) {
     $available_variations = array();
 
     foreach ($_product->get_children() as $child_id) {
-        $child = $_product->get_child($child_id);
+        $child = wc_get_product($child_id);
 
-        if (!empty($child->variation_id)) {
+        if (!empty($child->get_id())) {
             $available_variations[] = $child->get_variation_attributes();
         }
     }
@@ -116,7 +116,7 @@ function bobsi_woo_commerce_get_possible_variations($_product, $variations) {
         }
         $variation_ids[] = $attrs;
     }
-    
+
     return $variation_ids;
 }
 

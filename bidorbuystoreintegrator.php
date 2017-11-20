@@ -3,12 +3,12 @@
  * Plugin Name: bidorbuy Store Integrator
  * Plugin URI: www.bidorbuy.co.za
  * @codingStandardsIgnoreStart
- * Description: The bidorbuy store integrator allows you to get products from your online store listed on bidorbuy
+ * Description: The bidorbuy store integrator allows you to get products from your online store listed on bidorbuy.
  * quickly and easily.
  * @codingStandardsIgnoreEnd
  * Author: bidorbuy
  * Author URI: www.bidorbuy.co.za
- * Version: 2.0.14
+ * Version: 2.0.15
  */
 
 /**
@@ -32,6 +32,7 @@ require_once(ABSPATH . '/wp-admin/includes/plugin.php');
 
 // TODO: Unsupported features: scheduled sale, onsale tax support, disabled variations
 define('BOBSI_PLUGIN_URL', WP_PLUGIN_URL . '/' . str_replace(basename(__FILE__), "", plugin_basename(__FILE__)));
+define('BOBSI_ENDPOINT_NAMESPACE', 'bidorbuystoreintegrator');
 
 define('BOBSI_WOOCOMMERCE_PLUGIN_PHP_FILE', 'woocommerce/woocommerce.php');
 define('BOBSI_WOOCOMMERCE_PLUGIN_FILE', WP_PLUGIN_DIR . '/' . BOBSI_WOOCOMMERCE_PLUGIN_PHP_FILE);
@@ -56,8 +57,11 @@ if (file_exists(BOBSI_WOOCOMMERCE_CURRENCY_CONVERTER_PLUGIN_FILE)) {
 
 global $wpdb;
 
-$dbSettings = array(bobsi\Db::SETTING_PREFIX => $wpdb->prefix, bobsi\Db::SETTING_SERVER => DB_HOST,
-    bobsi\Db::SETTING_USER => DB_USER, bobsi\Db::SETTING_PASS => DB_PASSWORD, bobsi\Db::SETTING_DBNAME => DB_NAME);
+$dbSettings = array(
+    bobsi\Db::SETTING_PREFIX => $wpdb->prefix, bobsi\Db::SETTING_SERVER => DB_HOST,
+    bobsi\Db::SETTING_USER => DB_USER, bobsi\Db::SETTING_PASS => DB_PASSWORD,
+    bobsi\Db::SETTING_DBNAME => DB_NAME
+);
 
 bobsi\StaticHolder::getBidorbuyStoreIntegrator()
     ->init(get_bloginfo('name'), get_bloginfo('admin_email'), $platform, get_option(bobsi\Settings::name), $dbSettings);
@@ -68,9 +72,10 @@ require_once(dirname(__FILE__) . '/woo-commerce.php');
 
 if (isset($_POST[bobsi\Settings::nameLoggingFormAction])) {
     $data = array(bobsi\Settings::nameLoggingFormFilename => (isset($_POST[bobsi\Settings::nameLoggingFormFilename]))
-        ? $_POST[bobsi\Settings::nameLoggingFormFilename] : '');
+        ? sanitize_text_field($_POST[bobsi\Settings::nameLoggingFormFilename]) : '');
+    
     $result = bobsi\StaticHolder::getBidorbuyStoreIntegrator()
-        ->processAction($_POST[bobsi\Settings::nameLoggingFormAction], $data);
+        ->processAction(sanitize_text_field($_POST[bobsi\Settings::nameLoggingFormAction]), $data);
 
     add_action('admin_notices', 'bobsi_show_message__updated');
 
@@ -87,7 +92,7 @@ register_activation_hook(__FILE__, 'bobsi_plugin_activate');
 /**
  * Check Woocommerce status plugin
  *
- * @return void  or exit if plugin doesn't install or disabled 
+ * @return void  or exit if plugin doesn't install or disabled
  */
 function bobsi_check_woocommers_plugin() {
     if (!is_plugin_active(BOBSI_WOOCOMMERCE_PLUGIN_PHP_FILE)) {
@@ -132,6 +137,9 @@ function bobsi_plugin_activate() {
 
     update_option(bobsi\Settings::name,
         bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->serialize(TRUE));
+
+    bobsi_register_endpoint();
+    flush_rewrite_rules();
 }
 
 /**
@@ -192,6 +200,7 @@ function bobsi_plugin_uninstall() {
     delete_option('bobsi_first_activate');
     uninstall_update_settings();
     bobsi_feature_4451_uninstall();
+    flush_rewrite_rules();
 }
 
 add_action('admin_init', 'bobsi_register_setting');
@@ -279,17 +288,14 @@ function bobsi_options() {
 
     $zip_loaded = array_key_exists('zip',
         bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getCompressLibraryOptions());
-    $export_link = BOBSI_PLUGIN_URL . 'export.php?t=' . bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()
-            ->getTokenExport();
-    $download_link =
-        BOBSI_PLUGIN_URL . 'download.php?t=' . bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()
-            ->getTokenDownload();
-    $resetaudit_link =
-        BOBSI_PLUGIN_URL . 'resetaudit.php?t=' . bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()
-            ->getTokenDownload();
-    $phpInfo_link =
-        BOBSI_PLUGIN_URL . 'version.php?t=' . bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()
-            ->getTokenDownload() . '&phpinfo=y';
+    $export_link = site_url() . '/' .BOBSI_ENDPOINT_NAMESPACE . '/export/'
+        . bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getTokenExport();
+    $download_link =site_url() . '/' .BOBSI_ENDPOINT_NAMESPACE . '/download/'
+        . bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getTokenDownload();
+    $resetaudit_link =site_url() . '/' .BOBSI_ENDPOINT_NAMESPACE . '/resetaudit/'
+        . bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getTokenDownload();
+    $phpInfo_link = site_url() . '/' .BOBSI_ENDPOINT_NAMESPACE . '/version/'
+        . bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getSettings()->getTokenDownload() . '&phpinfo=y';
     $logfiles_table = bobsi\StaticHolder::getBidorbuyStoreIntegrator()->getLogsHtml();
     $tooltip_img_url = plugins_url('assets/images/tooltip.png', __FILE__);
     $bob_logo_url = plugins_url('assets/images/bidorbuy.png', __FILE__);
@@ -348,13 +354,17 @@ function bobsi_admin_submit_form() {
         $presaved_settings = array();
         $prevent_saving = FALSE;
 
-        $settings_checklist = array(bobsi\Settings::nameUsername => 'strval', bobsi\Settings::namePassword => 'strval',
-            bobsi\Settings::nameFilename => 'strval', bobsi\Settings::nameCompressLibrary => 'strval',
-            bobsi\Settings::nameDefaultStockQuantity => 'intval',
-            bobsi\Settings::nameEmailNotificationAddresses => 'strval',
-            bobsi\Settings::nameEnableEmailNotifications => 'bool', bobsi\Settings::nameLoggingLevel => 'strval',
-            bobsi\Settings::nameExportQuantityMoreThan => 'intval',
-            bobsi\Settings::nameExcludeCategories => 'categories', bobsi\Settings::nameExportStatuses => 'categories');
+        $settings_checklist = array(bobsi\Settings::nameUsername => 'strval',
+                                    bobsi\Settings::namePassword => 'strval',
+                                    bobsi\Settings::nameFilename => 'strval',
+                                    bobsi\Settings::nameCompressLibrary => 'strval',
+                                    bobsi\Settings::nameDefaultStockQuantity => 'intval',
+                                    bobsi\Settings::nameEmailNotificationAddresses => 'strval',
+                                    bobsi\Settings::nameEnableEmailNotifications => 'bool',
+                                    bobsi\Settings::nameLoggingLevel => 'strval',
+                                    bobsi\Settings::nameExportQuantityMoreThan => 'intval',
+                                    bobsi\Settings::nameExcludeCategories => 'categories',
+                                    bobsi\Settings::nameExportStatuses => 'categories');
 
         $data = $_POST;
 
@@ -690,3 +700,55 @@ function bobsi_feature_4451_uninstall() {
     return $result;
 }
 
+/**
+ * Register endpoint
+ *
+ * @return void
+ */
+function bobsi_register_endpoint() {
+    add_rewrite_endpoint(BOBSI_ENDPOINT_NAMESPACE, EP_ROOT);
+}
+
+add_action('init', 'bobsi_register_endpoint');
+
+/**
+ * Endpoint controller
+ *
+ * @param object $query request
+ *
+ * @return void
+ */
+function bobsi_init_endpoint($query) {
+    $request = $query->get(BOBSI_ENDPOINT_NAMESPACE);
+    if ($query->is_main_query() && $request) {
+        $params = explode('/', $request);
+        $action = sanitize_text_field($params[0]);
+        $token = isset($params[1]) ? substr($params[1], 0, 32) : '';
+        $token = sanitize_text_field($token);
+        $_REQUEST[bobsi\Settings::paramToken] = $token;
+        switch ($action) {
+            case 'export':
+                include_once 'export.php';
+                break;
+            case 'download':
+                include_once 'download.php';
+                break;
+            case 'resetaudit':
+                include_once 'resetaudit.php';
+                break;
+            case 'version':
+                $phpInfoParam = isset($params[1]) ? sanitize_text_field($params[1]) : '';
+                $phpInfo = strpos($phpInfoParam, 'phpinfo=y') !== FALSE;
+                if ($phpInfo) {
+                    $_REQUEST['phpinfo'] = 'y';
+                }
+                include_once 'version.php';
+                break;
+            case 'downloadl':
+                include_once 'downloadl.php';
+                break;
+        }
+    }
+}
+
+add_action('pre_get_posts', 'bobsi_init_endpoint');

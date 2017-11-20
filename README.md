@@ -1,12 +1,15 @@
 # WordPress bidorbuy Store Integrator
 
+bidorbuy Store Integrator warning: to improve plugin security the export/download link structure will be changed from Store Integrator 2.0.15 version and higher. Please ensure you have provided updated links to bidorbuy.
+
 ### Compatibility
 
 |         Product         |     WordPress 4.3   |      WordPress 4.4   | WordPress 4.5.3     | WordPress 4.7.2      |  PHP version   |
 |         -------         |          ---        |         ---          |       ---           |        ---           |      ---       |
-| Store Integrator-2.0.14 | ✓ WooCommerce 2.4.6 | ✓ WooCommerce 2.4.8 | ✓ WooCommerce 2.5.5 | ✓ WooCommerce  3.1.1 | 5.4,  5.6,  7.0|
-| Store Integrator-2.0.13 | ✓ WooCommerce 2.4.6 | ✓ WooCommerce 2.4.8 | ✓ WooCommerce 2.5.5 | ✓ WooCommerce  3.1.1 | 5.4,  5.6,  7.0|
-| Store Integrator-2.0.12 | ✓ WooCommerce 2.4.6 | ✓ WooCommerce 2.4.8 | ✓ WooCommerce 2.5.5 | ✓ WooCommerce  3.1.1 | 5.4,  5.6,  7.0|
+| Store Integrator-2.0.15 | ×  | ×  | ×  | ✓ WooCommerce  3.0, 3.1, 3.2 | 5.4,  5.6 |
+| Store Integrator-2.0.14 | ✓ WooCommerce 2.4.6 | ✓ WooCommerce 2.4.8 | ✓ WooCommerce 2.5.5 | ✓ WooCommerce  3.0, 3.1, 3.2 | 5.4,  5.6|
+| Store Integrator-2.0.13 | ✓ WooCommerce 2.4.6 | ✓ WooCommerce 2.4.8 | ✓ WooCommerce 2.5.5 | ✓ WooCommerce  3.0, 3.1, 3.2 | 5.4,  5.6|
+| Store Integrator-2.0.12 | ✓ WooCommerce 2.4.6 | ✓ WooCommerce 2.4.8 | ✓ WooCommerce 2.5.5 | ✓ WooCommerce  3.0, 3.1, 3.2 | 5.4,  5.6|
 | Store Integrator-2.0.11 | ✓ WooCommerce 2.4.6 | ✓ WooCommerce 2.4.8 | ✓ WooCommerce 2.5.5 |         ×            | 5.4            |
 | Store Integrator-2.0.10 | ✓ WooCommerce 2.4.6 | ✓ WooCommerce 2.4.8 | ✓ WooCommerce 2.5.5 |         ×            | 5.3            | 
 
@@ -31,6 +34,7 @@ PHP extensions: curl, mbstring
 2. Go to Plugins > Add New > press Upload Plugin button.
 3. Upload `bidorbuy Store Integrator` archive (do not unpack the archive).
 4. Activate the plugin through the 'Plugins' menu in WordPress.
+5. Enable pretty permalinks in Settings > Permalinks (default permalinks will not work).
 
 ### Uninstallation
 
@@ -55,10 +59,10 @@ Remove all old files of previous installation:
 6. Press the `Download` button.
 7. Share Export Links with "bidorbuy".
 8. To display BAA fields on the setting page add '&baa=1' to URL in address bar.
-9. To include attribute name to product title set an appropriate checkbox to Yes:
 
-For Global attributes - is configuring on attributes page (WooCoommerce > Products > Attributes page > Add new/Edit Attribute > Add this attribute to product name in bidorbuy Store Integrator tradefeed > Yes).
+To include attribute name to product title set an appropriate checkbox to Yes:
 
-For Custom attributes - is configuring on a product page (Woo Commerce > Product > Attributes > Add this attribute to product name in bidorbuy Store Integrator tradefeed > Yes).
+- For Global attributes - is configuring on attributes page (WooCoommerce > Products > Attributes page > Add new/Edit Attribute > Add this attribute to product name in bidorbuy Store Integrator tradefeed > Yes).
+- For Custom attributes - is configuring on a product page (Woo Commerce > Product > Attributes > Add this attribute to product name in bidorbuy Store Integrator tradefeed > Yes).
 
 Note please: this feature supports WooCommerce 3.0.0 and higher!

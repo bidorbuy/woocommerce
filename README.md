@@ -6,8 +6,9 @@ bidorbuy Store Integrator warning: to improve plugin security the export/downloa
 
    Product         | PHP version   |     WordPress 4.3      |      WordPress 4.4     |    WordPress 4.5.3     |    WordPress 4.7.2      |    WordPress 4.8.3   |  
 |         -------         |       ---     |          ---           |         ---            |       ---              |        ---              |      ---             |     
+| Store Integrator-2.1.1  |5.4,  5.6      | ✓ WooCommerce 2.4.6 + | ✓ WooCommerce 2.4.8 +  | ✓ WooCommerce 2.5.5 +  | ✓ WooCommerce 3.1.1   | ✓ WooCommerce 3.2.1 |  
 | Store Integrator-2.1.0  |5.4,  5.6      | ✓ WooCommerce 2.4.6 + | ✓ WooCommerce 2.4.8 +  | ✓ WooCommerce 2.5.5 +  | ✓ WooCommerce 3.1.1   | ✓ WooCommerce 3.2.1 |  
- Store Integrator-2.0.15 |5.4,  5.6      |  ×   | ×     | ×     | ✓ WooCommerce  3.0 +  | ×                    |
+| Store Integrator-2.0.15 |5.4,  5.6      |  ×   | ×     | ×     | ✓ WooCommerce  3.0 +  | ×                    |
 | Store Integrator-2.0.14 |5.4,  5.6      | ✓ WooCommerce 2.4.6   | ✓ WooCommerce 2.4.8    | ✓ WooCommerce 2.5.5    | ✓ WooCommerce  3.0 +  | ×                    |
 | Store Integrator-2.0.13 |5.4,  5.6      | ✓ WooCommerce 2.4.6   | ✓ WooCommerce 2.4.8    | ✓ WooCommerce 2.5.5    | ✓ WooCommerce  3.0 +  | ×                    |  
 | Store Integrator-2.0.12 |5.4,  5.6      | ✓ WooCommerce 2.4.6   | ✓ WooCommerce 2.4.8    | ✓ WooCommerce 2.5.5    | ✓ WooCommerce  3.0 +  | ×                    |

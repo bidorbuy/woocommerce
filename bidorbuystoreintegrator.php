@@ -7,7 +7,7 @@
  * @codingStandardsIgnoreEnd
  * Author: bidorbuy
  * Author URI: www.bidorbuy.co.za
- * Version: 2.1.0
+ * Version: 2.1.1
  */
 
 /**
@@ -266,7 +266,7 @@ function bobsi_options() {
             name="bobsi_inc_categories[]" multiple="multiple" size="9">';
     $excluded_categories = '<select id="bobsi-exc-categories" class="bobsi-categories-select" 
             name="excludeCategories[]" multiple="multiple" size="9">';
-    $categories = bobsi_get_categories(['hide_empty' => 0]);
+    $categories = bobsi_get_categories(array('hide_empty' => 0));
 
     $uncat = new stdClass();
     $uncat->term_id = 0;
@@ -509,14 +509,21 @@ function bobsi_plugin_check_update() {
         if (version_compare($database_version, '2.0.15', '<')) {
             update_option('bobsi_show_admin_notices', 1);
         }
+        if (version_compare($database_version, '2.1.1', '<')) {
+            bobsi_update_tables_collation();
+        }
     } else {
-        /**/
+        /* First install or old plugin version < 2.0.7 */
         plugin_update();
         bobsi_feature_4451_update();
+        bobsi_update_tables_collation();
     }
 
     $version = bobsi\Version::getVersionFromString(bobsi\Version::$version);
-    update_option('bobsi_db_version', $version);
+    
+    if ($database_version !== $version) {
+        update_option('bobsi_db_version', $version);
+    }
 }
 
 /**
@@ -616,7 +623,7 @@ function bobsi_woocommerce_attribute_added($attribute_id) {
     global $wpdb;
     $attributeFlag = isset($_POST[BOBSI_WOOCOMMERCE_ATTRIBUTE_COLUMN]) ? $_POST[BOBSI_WOOCOMMERCE_ATTRIBUTE_COLUMN] : 0;
     $wpdb->update($wpdb->prefix . 'woocommerce_attribute_taxonomies',
-        [BOBSI_WOOCOMMERCE_ATTRIBUTE_COLUMN => $attributeFlag], array('attribute_id' => $attribute_id));
+        array(BOBSI_WOOCOMMERCE_ATTRIBUTE_COLUMN => $attributeFlag), array('attribute_id' => $attribute_id));
 }
 
 /**
@@ -630,7 +637,7 @@ function bobsi_woocommerce_attribute_updated($attribute_id) {
     global $wpdb;
     $attributeFlag = isset($_POST[BOBSI_WOOCOMMERCE_ATTRIBUTE_COLUMN]) ? $_POST[BOBSI_WOOCOMMERCE_ATTRIBUTE_COLUMN] : 0;
     $wpdb->update($wpdb->prefix . 'woocommerce_attribute_taxonomies',
-        [BOBSI_WOOCOMMERCE_ATTRIBUTE_COLUMN => $attributeFlag], array('attribute_id' => $attribute_id));
+        array(BOBSI_WOOCOMMERCE_ATTRIBUTE_COLUMN => $attributeFlag), array('attribute_id' => $attribute_id));
 }
 
 /* Custom Attributes */
@@ -669,7 +676,7 @@ function bobsi_woocommerce_after_product_attribute_settings($attribute, $i) {
 function bobsi_wp_ajax_woocommerce_save_attributes() {
     parse_str($_POST['data'], $data);
     $product_id = absint($_POST['post_id']);
-    $exclutedAttributes = [];
+    $exclutedAttributes = array();
     $attributes = $data['attribute_names'];
     foreach ($attributes as $key => $attribute) {
         if (!isset($data[BOBSI_WOOCOMMERCE_ATTRIBUTE_FIELD][$key])) {
@@ -815,4 +822,30 @@ function bobsi_new_urls_warning() {
 
 if (get_option('bobsi_show_admin_notices')) {
     add_action('admin_notices', 'bobsi_new_urls_warning');
+}
+
+/**
+ * Update table collation if collation isn't utf8_unicode_ci
+ * 
+ * @return void
+ */
+function bobsi_update_tables_collation() {
+    global $wpdb;
+    $showTableInfoSql = "SHOW TABLE STATUS WHERE name='{$wpdb->prefix}%s'";
+    $alterTableSql = "ALTER TABLE {$wpdb->prefix}%s CONVERT TO CHARACTER SET utf8 COLLATE utf8_unicode_ci";
+    $tableNames = [
+        bobsi\Queries::TABLE_BOBSI_TRADEFEED_AUDIT,
+        bobsi\Queries::TABLE_BOBSI_TRADEFEED,
+        bobsi\Queries::TABLE_BOBSI_TRADEFEED_TEXT
+    ];
+    foreach ($tableNames as $tableName) {
+        $showTableInfoQuery = sprintf($showTableInfoSql, $tableName);
+        $result = $wpdb->get_results($showTableInfoQuery, ARRAY_A);
+        $result = array_shift($result);
+
+        if ($result['Collation'] !== 'utf8_unicode_ci') {
+            $alterTableQuery = sprintf($alterTableSql, $tableName);
+            $wpdb->query($alterTableQuery);
+        }
+    }
 }

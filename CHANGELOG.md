@@ -2,6 +2,11 @@
 
 ### Changelog
 
+#### 2.1.1
+* Added force CONVERT TO CHARACTER SET utf8_unicode_ci by default for next database tables: bobsi_tradefeed_product, bobsi_tradefeed_product_base, bobsi_tradefeed_audit.
+
+_[Updated on November 30, 2017]_
+
 #### 2.1.0
 * Restored compatibility with WooCommerce < 3.0.0.
 * Fixed dependence on pretty permalinks.

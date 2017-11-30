@@ -2,9 +2,9 @@
 
 Contributors: extremeidea
 Tags:  products, export, catalog, xml, variables, items, store
-Requires at least: 4.x
+Requires at least: 4.0
 Requires PHP: 5.4
-Tested up to: 4.7
+Tested up to: 4.9
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -86,6 +86,11 @@ Note please: this feature supports WooCommerce 3.0.0 and higher!
 3. screenshot-3.jpg
 
 == Changelog ==
+
+#### 2.1.1
+* Added force CONVERT TO CHARACTER SET utf8_unicode_ci by default for next database tables: bobsi_tradefeed_product, bobsi_tradefeed_product_base, bobsi_tradefeed_audit.
+
+_[Updated on November 30, 2017]_
 
 #### 2.1.0
 * Restored compatibility with WooCommerce < 3.0.0.

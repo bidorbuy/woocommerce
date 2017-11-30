@@ -1,0 +1,229 @@
+.bobsi-select {
+    width: 67%;
+}
+.bobsi-select[multiple] {
+    width: 100%;
+    height: 200px !important;
+}
+.bobsi-select {
+    width: 67%;
+}
+.bobsi-select[multiple] {
+    width: 100%;
+    height: 100px !important;
+}
+#tiptip_content {
+    background: #aaaaaa;
+}
+
+/*
+ * TODO paint tip's arrow in #aaa color
+ */
+
+#bobsi-admin-header {
+    width: 100%;
+    margin-top: 15px;
+    vertical-align: middle;
+}
+
+#bobsi-icon-trade-feed {
+    background-color: transparent;
+    background-repeat: no-repeat;
+    height: 62px;
+    margin: 7px 8px 0 0;
+    width: 240px;
+    display: block;
+    float: left;
+}
+
+h2 {
+    display: inline-block;
+}
+
+#bobsi-adv {
+    float: right;
+    width: 468px;
+    height: 60px;
+    margin: 5px 15px 0 0;
+}
+
+#poststuff {
+    margin-right: 15px;
+    clear: both;
+}
+
+#poststuff h3 {
+    border-bottom: 1px solid #e1e1e1;
+}
+
+.postbox {
+    width: 49%;
+    float: left;
+    min-height: 650px;
+}
+
+.postbox-inner h3{
+    cursor: default !important;
+}
+
+.links, .logfiles {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+}
+
+.links, .version, .debug {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+}
+
+.links, .version h3 span {
+    font-size: 10px;
+}
+
+.form-table.export-links, .form-table.log-links {
+    width: 100%;
+}
+
+.form-table td {
+   word-break: break-all;
+   word-wrap: break-word;
+}
+
+.form-table th {
+    font-weight: normal;
+    padding-left: 10px;
+}
+
+.help_tip {
+    float: right;
+}
+
+fieldset {
+    border: 1px #ddd solid;
+}
+
+.bobsi-input {
+    width: 67%;
+}
+
+#ctrl-c-message {
+    display: none;
+    position: absolute;
+    text-align: center;
+    padding: 10px;
+    width: 120px;
+    background: #43D8FA;
+    color: white;
+    font-size: large;
+    border-radius: 8px;
+    z-index: 99999999;
+}
+
+.bobsi-url {
+    cursor: pointer;
+    width: 100%;
+}
+.export-links tr td:first-child {
+    width: 150px;
+}
+td + td + td {
+    text-align: right;
+    width: 200px;
+}
+
+.postbox.postbox-inner .data-item img.help_tip {
+    margin-top: 5px;
+}
+
+.postbox.postbox-inner .last-item img.help_tip {
+    margin-top: 0;
+}
+
+#cats-right {
+    width: 45%;
+    text-align: left;
+}
+
+#cats-left {
+    width: 45%;
+}
+
+#cats-middle {
+    vertical-align: middle;
+}
+
+.postbox.postbox-right {
+    float: right;
+}
+
+#bobsi-admin-header h2 {
+    margin-top: 30px;
+    display: block;
+    float: left;
+}
+
+@media only screen and (max-width: 1110px) {
+    .title-item {
+        display: block;
+        float: left;
+        width: 70%;
+    }
+
+    .help_tip {
+        float: none;
+    }
+}
+
+.button-item {
+    padding-top: 0;
+    clear: both;
+}
+
+.button-item .button,
+input.bobsi-save-settings{
+    float: right;
+    margin-bottom: 10px !important;
+}
+
+@media only screen and (max-width: 615px) {
+    .button-section .button {
+        padding-left: 1px;
+        padding-right: 1px;
+    }
+}
+
+@media only screen and (max-width: 570px) {
+    .button-section {
+        padding-left: 0 !important;
+    }
+
+    .button-section .button {
+        padding-left: 1px;
+        padding-right: 1px;
+    }
+}
+
+.submit {
+    padding: 0;
+}
+
+td.bobsi-top {
+    vertical-align: top;
+}
+#poststuff h3 {
+    font-size: 14px;
+    padding: 8px 12px;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.bobsi-select {
+    overflow-x: scroll;
+}
+.bobsi-categories-select{
+    min-width: 190px;
+    font-size: 12px;
+    max-height: 200px;
+}

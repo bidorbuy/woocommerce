@@ -347,9 +347,17 @@ function bobsi_export_products($id, $available_variations = array()) {
     }
 
     if (!($product instanceof WC_Product_Variation)) {
-        $postData = get_post(bobsi_helper_get_product_id($product));
-        $exportedProducts[bobsi\Tradefeed::nameProductSummary] = $postData->post_excerpt;
-        $exportedProducts[bobsi\Tradefeed::nameProductDescription] = $postData->post_content;
+        if (method_exists($product, 'get_description')) {
+            $summary = $product->get_short_description();
+            $description = $product->get_description();
+        } else {
+            $postData = get_post(bobsi_helper_get_product_id($product));
+            $summary = $postData->post_excerpt;
+            $description = $product->post_content;
+        }
+
+        $exportedProducts[bobsi\Tradefeed::nameProductSummary] = $summary;
+        $exportedProducts[bobsi\Tradefeed::nameProductDescription] = $description;
     }
 
     if ($product instanceof WC_Product_Variable) {

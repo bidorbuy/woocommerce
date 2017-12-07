@@ -2,6 +2,11 @@
 
 ### Changelog
 
+#### 2.1.2
+* Improved the description export process.
+
+_[Updated on December 06, 2017]_
+
 #### 2.1.1
 * Added force CONVERT TO CHARACTER SET utf8_unicode_ci by default for next database tables: bobsi_tradefeed_product, bobsi_tradefeed_product_base, bobsi_tradefeed_audit.
 

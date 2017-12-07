@@ -87,6 +87,11 @@ Note please: this feature supports WooCommerce 3.0.0 and higher!
 
 == Changelog ==
 
+#### 2.1.2
+* Improved product description export.
+
+_[Updated on December 06, 2017]_
+
 #### 2.1.1
 * Added force CONVERT TO CHARACTER SET utf8_unicode_ci by default for next database tables: bobsi_tradefeed_product, bobsi_tradefeed_product_base, bobsi_tradefeed_audit.
 
